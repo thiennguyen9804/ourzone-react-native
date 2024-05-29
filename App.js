@@ -10,10 +10,14 @@ const Stack = createNativeStackNavigator();
 export default function App() {
   return (
     <NavigationContainer>
+      <StatusBar />
       <Stack.Navigator
         screenOptions={{
-          headerShown: false
+          headerShown: false,
         }}
+        initialRouteName='Camera'
+
+      
       >
         <Stack.Screen name="Camera" component={CameraScreen} />
         <Stack.Screen name="History" component={HistoryScreen} />

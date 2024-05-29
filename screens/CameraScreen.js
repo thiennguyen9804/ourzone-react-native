@@ -17,7 +17,7 @@ import flashOnIcon from '../assets/flash-on-icon';
 import flashOffIcon from '../assets/flash-off-icon';
 import cancelIcon from '../assets/cancel-icon';
 import sendIcon from '../assets/send-icon';
-import Animated, { SlideInUp, SlideOutUp } from 'react-native-reanimated';
+import Animated, { SlideInDown, SlideInLeft, SlideInUp, SlideOutRight, SlideOutUp } from 'react-native-reanimated';
 
 const CameraScreen = ({ navigation }) => {
 	// console.log(navigation);
@@ -54,36 +54,24 @@ const CameraScreen = ({ navigation }) => {
 		toggleStatus();
 	}
 
-	if(!permission) {
-		return (
-			<Text>There's no permission</Text>
-		)
-	}
-
-	if (!permission.granted) {
-		// Camera permissions are not granted yet.
-		return (
-		  	<View style={styles.container}>
-			  	<Text style={{ textAlign: 'center' }}>We need your permission to show the camera</Text>
-		  	  	<Button onPress={requestPermission} title="grant permission" />
-		  	</View>
-		);
-	}
-
 	return (
 		<Animated.View 
 			style={styles.container}
-			entering={SlideOutUp}
-			exiting={SlideInUp}
+			entering={SlideInDown}
+			exiting={SlideOutUp}
 		>
 			<View style={styles.navSection}>
 				<TouchableOpacity style={[styles.navBtn, styles.avatar]}>
 					<Image />
 				</TouchableOpacity>
+
+				{/* friend nav */}
 				<TouchableOpacity style={styles.friendBtn}>
 					<SvgXml xml={friendIcon}/>
 					<Text style={styles.friendTxt}>Friend</Text>
 				</TouchableOpacity>
+
+				{/* chat nav */}
 				<TouchableOpacity style={styles.navBtn}>
 					<SvgXml xml={chatIcon} />
 				</TouchableOpacity>
@@ -124,7 +112,7 @@ const CameraScreen = ({ navigation }) => {
 					<View style={styles.imageSection}>
 						<Image source={{uri: imageUri}} style={styles.camera} />
 						<View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
-							<TextInput textAlign='center' numberOfLines={1} multiline style={styles.messageInput} onChangeText={setMessage} value={message}/>
+							<TextInput textAlign='center' numberOfLines={1} style={styles.messageInput} onChangeText={setMessage} value={message}/>
 						</View>
 					</View>
 
@@ -247,10 +235,6 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		backgroundColor: '#fff',
 		letterSpacing: 1.2,
-		flex: 1,
-		flexGrow: 1,
-		flexWrap: 'nowrap',
-		maxWidth: '100%',
 		borderWidth: 5,
 		borderColor: '#fff',
 		paddingHorizontal: 10,
