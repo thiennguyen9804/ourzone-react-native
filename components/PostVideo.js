@@ -1,16 +1,24 @@
 import { Image, StyleSheet, View, Text, useWindowDimensions } from 'react-native';
+import { Video, ResizeMode } from 'expo-av';
 
 import { formatDistanceStrict } from 'date-fns';
 
-export default function PostImage({ name, imageUri, userAvatar }) {
+export default function PostVideo({ name, imageUri, userAvatar }) {
 	// console.log(uri);
 	const { height } = useWindowDimensions();
+
 	return (
 		<View style={[styles.container, { height }]}>
 			{/* image  */}
 			<View style={styles.imageContainer}>
 				<View style={styles.innerImageContainer}>
-					<Image style={styles.image} resizeMode='cover' source={require('../assets/Kiana Avatar.jpg')}/>
+					<Video
+						style={styles.image}
+						source={require('../assets/Kiana Video.mp4')}
+						isLooping
+						resizeMode={ResizeMode.COVER}
+						shouldPlay
+					/>
 				</View>
 			</View>
 
@@ -51,7 +59,7 @@ const styles = StyleSheet.create({
 		width: '100%',
 		aspectRatio: 1,
 		borderRadius: 35,
-		elevation: 13,
+		// elevation: 13,
 		overflow: 'hidden'
 	},
 

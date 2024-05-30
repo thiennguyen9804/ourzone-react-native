@@ -9,27 +9,38 @@ import backIcon from "../assets/back-icon";
 import friendArrowIcon from "../assets/friend-arrow-icon";
 import chatIcon from "../assets/chat-icon";
 import PostImage from "../components/PostImage";
+import PostVideo from "../components/PostVideo";
 
 const posts = [
 	{
 		id: 1,
-		uri: '../assets/Kiana Avatar.jpg'
+		uri: '../assets/Kiana Avatar.jpg',
+		type: 'video'
 	},
 	{
 		id: 2,
-		uri: '../assets/Kiana Avatar.jpg'
+		uri: '../assets/Kiana Avatar.jpg',
+		type: 'image'
 	},
 	{
 		id: 3,
-		uri: '../assets/Kiana Avatar.jpg'
+		uri: '../assets/Kiana Avatar.jpg',
+		type: 'image'
 	},
 	{
 		id: 4,
-		uri: '../assets/Kiana Avatar.jpg'
+		uri: '../assets/Kiana Avatar.jpg',
+		type: 'video'
 	},
 	{
 		id: 5,
-		uri: '../assets/Kiana Avatar.jpg'
+		uri: '../assets/Kiana Avatar.jpg',
+		type: 'video'
+	},
+	{
+		id: 6,
+		uri: '../assets/Kiana Avatar.jpg',
+		type: 'image'
 	},
 ]
 
@@ -67,13 +78,18 @@ const HistoryScreen = ({ navigation }) => {
 				style={styles.list}
 				data={posts}
 				renderItem={({item}) => (
-					<PostImage key={item.id} uri={item.uri}/>
+					item.type === 'image' ? (
+						<PostImage key={item.id} uri={item.uri}/>
+					) : (
+						<PostVideo />
+					)
 				)}
 				showsVerticalScrollIndicator={false}
 				showsHorizontalScrollIndicator={false}
 				pagingEnabled
-				
+					
 			/>
+			{/* <PostVideo /> */}
 
 			<View>
 				{/* footer buttons */}
@@ -90,14 +106,21 @@ export default HistoryScreen
 const styles = StyleSheet.create({
 	container: {
 		display: 'flex',
-		flexDirection: 'column'
+		flexDirection: 'column',
+		flex: 1,
+		// position: 'absolute'
 	},
 
 	headerSection: {
+		position: 'absolute',
 		display: 'flex',
 		flexDirection: 'row',
 		marginTop: 60,
+		// top: 50,
+		// left: 50,
 		justifyContent: 'space-around',
+		zIndex: 1,
+		width: '100%'
 	},
 
 	friendTxt: {
@@ -140,9 +163,19 @@ const styles = StyleSheet.create({
 	},
 	
 	list: {
-		marginTop: 40,
+		
+		// flexWrap: 'wrap',
+		// aspectRatio: 1
+		// height: null,
+		// backgroundColor: 'orange'
+	},
+
+	listContainer: {
+		// flex: 1,
 		width: '100%',
-		aspectRatio: 1
+		height: '100%',
+		position: 'absolute'
+		// backgroundColor: 'aqua'
 	}
 
 });
