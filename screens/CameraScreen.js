@@ -1,59 +1,120 @@
 // framework
-import { CameraView, useCameraPermissions } from 'expo-camera'
-import React, { useState, useRef } from 'react'
+import { useCameraPermissions, useMicrophonePermissions } from 'expo-camera'
+import { Camera, CameraType, FlashMode } from 'expo-camera/legacy';
+import React, { useState, useRef, useCallback, useMemo, useEffect } from 'react'
 import { Button, StyleSheet, View, Text, TouchableOpacity, Image, TextInput, Dimensions } from 'react-native'
 import { SvgXml } from 'react-native-svg';
-import { Swipeable } from 'react-native-gesture-handler';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { Video, ResizeMode } from 'expo-av';
 import { manipulateAsync, FlipType } from 'expo-image-manipulator';
+import Animated, { SlideInDown, SlideInLeft, SlideInUp, SlideOutRight, SlideOutUp, useSharedValue } from 'react-native-reanimated';
+import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+// widgets
+import CaptureButton from '../widgets/CaptureButton';
 
 // icon 
 import friendIcon from '../assets/friend-icon';
 import chatIcon from '../assets/chat-icon';
-import cameraIcon from '../assets/camera-icon';
 import flipIcon from '../assets/flip-icon';
 import flashOnIcon from '../assets/flash-on-icon';
 import flashOffIcon from '../assets/flash-off-icon';
 import cancelIcon from '../assets/cancel-icon';
 import sendIcon from '../assets/send-icon';
-import Animated, { SlideInDown, SlideInLeft, SlideInUp, SlideOutRight, SlideOutUp } from 'react-native-reanimated';
+import cameraIcon from '../assets/camera-icon';
 
 const CameraScreen = ({ navigation }) => {
-	// console.log(navigation);
-	const [flashMode, setFlashMode] = useState('off');
-	const [facing, setFacing] = useState('front');
+	// variables
+	const [flashMode, setFlashMode] = useState(FlashMode.off);
+	const [facing, setFacing] = useState(CameraType.back);
 	const [permission, requestPermission] = useCameraPermissions();
 	const [imageUri, setImageUri] = useState(null);
+	const [videoUri, setVideoUri] = useState(null);
+	const [captureMode, setCaptureMode] = useState('video');
+	// let mutableCaptureMode = 'picture'
 	const [status, setStatus] = useState(false); // false: not capture yet | true: captured
 	const [message, setMessage] = useState(null);
 	const cameraRef = useRef();
-	const toggleFlashMode = () => setFlashMode(curr => curr === 'off' ? 'on' : 'off');
-	const toggleFacing = () => setFacing(curr => curr === 'front' ? 'back' : 'front');
-	const toggleStatus = () => setStatus(curr => !curr)
-	const takePhoto = async e => {
-		if(cameraRef.current) {
-			const options = { quality: 0.5, base64: true, skipProcessing: true, isImageMirror: false };
-			const data = await cameraRef.current.takePictureAsync(options);
-			if(facing === 'front') {
-				const manipResult = await manipulateAsync(
-					data.uri,
-					[{rotate: 180}, {flip: FlipType.Vertical}]
-				);
+	const isPressingButton = useSharedValue(false);
+	const [cameraStatus, requestCameraPermission] = Camera.useCameraPermissions();
+	const [microphoneStatus, requestMicrophonePermission] = Camera.useMicrophonePermissions();
+	// end variables
 
-				setImageUri(manipResult.uri);
-			} else {
-				setImageUri(data.uri);
+	// functions
+	const toggleFlashMode = () => setFlashMode(curr => curr === FlashMode.off ? FlashMode.on : FlashMode.off);
+	const toggleFacing = () => setFacing(curr => curr === CameraType.front ? CameraType.back : CameraType.front);
+	const toggleStatus = () => setStatus(curr => {
+		console.log(curr);
+		return !curr
+	})
+	const takePhoto = useCallback(async () => {
+		try {
+			if(cameraRef.current) {
+				const options = { quality: 0.5, base64: true, skipProcessing: true, isImageMirror: false };
+				const data = await cameraRef.current.takePictureAsync(options);
+				// if(facing === 'front') {
+				// 	const manipResult = await manipulateAsync(
+				// 		data.uri,
+				// 		[{rotate: 180}, {flip: FlipType.Vertical}]
+				// 	);
+	
+				// 	setImageUri(manipResult.uri);
+				// } else {
+				// 	setImageUri(data.uri);
+				// }
+				setImageUri(data.uri)
+				if(data.uri) {
+					// console.log(imag)
+					toggleStatus();
+				}
 			}
-			if(data.uri) {
-				toggleStatus();
-			}
+		} catch(error) {
+			console.log(error.message)
 		}
-	}
+	}, [flashMode, facing, setCaptureMode]);
+
+	const startRecord = useCallback(async () => {
+		
+		// console.log('capture mode: ', mutableCaptureMode);
+		try {
+			if(cameraRef.current) {
+				const options = { quality: '1080p', mute: true };
+				const data =  await cameraRef.current.recordAsync(options);
+				setVideoUri(data.uri);
+				if(data.uri) {
+					toggleStatus();
+				}
+				
+			}
+		} 
+		catch(error) {
+			console.log(error.message)
+		}
+		
+	}, [flashMode, facing]);
+
+	const stopRecord = useCallback(() => {
+		cameraRef.current.stopRecording();
+		console.log('stop record');
+		
+	}, [flashMode, facing]);
+
 	const cancelHandler = () => {
+		setImageUri(null);
+		setVideoUri(null)
 		toggleStatus();
 	}
 
+	const setIsPressingButton = (_isPressingButton) => {
+		isPressingButton.value = _isPressingButton;
+	}
+	// end functions
+
+	// side effect
+	useEffect(() => {
+		requestCameraPermission();
+		requestMicrophonePermission();
+	}, []);
+
+	// ui render
 	return (
 		<Animated.View 
 			style={styles.container}
@@ -61,6 +122,7 @@ const CameraScreen = ({ navigation }) => {
 			exiting={SlideOutUp}
 		>
 			<View style={styles.navSection}>
+				{/* profile */}
 				<TouchableOpacity style={[styles.navBtn, styles.avatar]}>
 					<Image />
 				</TouchableOpacity>
@@ -79,8 +141,17 @@ const CameraScreen = ({ navigation }) => {
 
 			
 			{!status ? (
+				// pre cap
 				<>
-					<CameraView  ref={cameraRef} style={styles.camera} facing={facing} flash={flashMode}/>
+					{/* camera */}
+					<Camera 
+						ref={cameraRef} 
+						style={styles.camera} 
+						type={facing} 
+						flashMode={flashMode}
+						ratio='1:1'
+					/>
+
 					<View style={styles.captureSection}>
 						{/* flash */}
 						<TouchableOpacity onPress={toggleFlashMode}>
@@ -88,11 +159,29 @@ const CameraScreen = ({ navigation }) => {
 						</TouchableOpacity>
 
 						{/* capture */}
-						<TouchableOpacity style={styles.captureBtn} onPress={takePhoto}>
-							<View style={styles.cameraBtnInner}>
-								<SvgXml style={{margin: 'auto'}} xml={cameraIcon}/>
+						<CaptureButton 
+							cameraRef={cameraRef} 
+							flashMode={flashMode} 
+							facing={facing} 
+							takePhoto={takePhoto} 
+							startRecord={startRecord} 
+							stopRecord={stopRecord}
+							enabled={true}
+							setIsPressingButton={setIsPressingButton}
+							captureMode={captureMode}
+							setCaptureMode={setCaptureMode}
+						/>
+
+						{/* <GestureDetector gesture={composed}>
+							<View style={styles.captureBtn}>
+								<View style={styles.cameraBtnInner}>
+									<SvgXml style={{margin: 'auto'}} xml={cameraIcon}/>
+								</View>
 							</View>
-						</TouchableOpacity>
+						</GestureDetector> */}
+
+						{/* <Button onPress={() => startRecord()} title='start' />
+						<Button onPress={() => stopRecord()} title='stop' /> */}
 
 						{/* len changing */}
 						<TouchableOpacity onPress={toggleFacing}>
@@ -107,10 +196,22 @@ const CameraScreen = ({ navigation }) => {
 				</>
 				
 			) : (
+				// post cap
 				<>
 					{/* message */}
 					<View style={styles.imageSection}>
-						<Image source={{uri: imageUri}} style={styles.camera} />
+						{imageUri && 
+							<Image source={{uri: imageUri}} style={styles.camera} />
+						}
+						{videoUri && 
+							<Video
+								style={styles.camera}
+								source={{uri: videoUri}}
+								isLooping
+								shouldPlay
+								resizeMode={ResizeMode.COVER}
+							/>
+						}
 						<View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
 							<TextInput textAlign='center' numberOfLines={1} style={styles.messageInput} onChangeText={setMessage} value={message}/>
 						</View>
