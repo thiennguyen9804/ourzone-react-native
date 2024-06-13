@@ -1,11 +1,12 @@
 
+
 const { getDefaultConfig, mergeConfig } = require('@react-native/metro-config');
 
-const defaultConfig = getDefaultConfig();
+const defaultConfig = getDefaultConfig(__dirname);
 
 const {
   resolver: { sourceExts, assetExts },
-} = getDefaultConfig();
+} = getDefaultConfig(__dirname);
 
 const config = {
   transformer: {

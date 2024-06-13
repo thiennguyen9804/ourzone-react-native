@@ -60,14 +60,14 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: '#738F81',
-    width: 150,
+    width: 155,
     height: 55,
     borderRadius: 35,
     marginTop:195,
   },
   btnText: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 17,
     fontFamily:'OpenSansBold',
   },
   btnsignin:
