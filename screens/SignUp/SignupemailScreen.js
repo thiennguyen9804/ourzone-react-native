@@ -4,7 +4,7 @@ import backIcon from "../../assets/back-icon";
 import { SvgXml } from "react-native-svg";
 
 
-const SigninemailScreen=({ navigation })=>{
+const SignupemailScreen=({ navigation })=>{
     const [text, onChangeText] = React.useState('');
     return(
         <ImageBackground style={{height:'100%',width:'100%',backgroundColor:'#AAC2B3'}} >
@@ -23,7 +23,7 @@ const SigninemailScreen=({ navigation })=>{
         value={text}
       />
            </View>
-           <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SigninPass')}>
+           <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SignupPass')}>
             <Text style={styles.text}>Continue</Text>
           </TouchableOpacity>
         </SafeAreaView>
@@ -87,4 +87,4 @@ const styles = StyleSheet.create({
 	
 })
 
-export default SigninemailScreen
+export default SignupemailScreen

@@ -5,7 +5,7 @@ import backIcon from '../../assets/back-icon';
 import hideIcon from '../../assets/eyehide-icon';
 import showIcon from '../../assets/eye-icon';
 
-const SigninpassScreen = ({ navigation }) => {
+const SignuppassScreen = ({ navigation }) => {
   const [text, onChangeText] = useState('');
   const [isSecureEntry, setIsSecureEntry] = useState(true);
 
@@ -13,7 +13,7 @@ const SigninpassScreen = ({ navigation }) => {
     <ImageBackground style={styles.background}>
       <StatusBar barStyle="dark-content" />
       <SafeAreaView>
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('SigninEmail')}>
+        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('SignupEmail')}>
           <SvgXml style={styles.backIcon} xml={backIcon} />
         </TouchableOpacity>
         <Text style={styles.txt}>Enter your password: </Text>
@@ -30,10 +30,13 @@ const SigninpassScreen = ({ navigation }) => {
             <SvgXml  style={{width: 21,height: 21}} xml={isSecureEntry ? showIcon : hideIcon} />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.forgot}>
-          <Text style={{color: '#FFFFFF',fontSize: 17, fontFamily: 'OpenSansBold',}}>Forgot password?</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btnContinue}  onPress={() => navigation.navigate('Camera')}>
+        <View style={styles.hint}>
+      <Text style={{ fontSize: 13}}>
+        <Text style={{ color: '#FFFFFF', fontFamily: 'OpenSans' }}>Password must have at least</Text>
+        <Text style={{ color: '#738F81', fontFamily: 'OpenSansBold' }}> 8 characters</Text>
+      </Text>
+    </View>
+        <TouchableOpacity style={styles.btnContinue} onPress={() => navigation.navigate('SignupName')}>
           <Text style={styles.text}>Continue</Text>
         </TouchableOpacity>
         
@@ -94,12 +97,13 @@ const styles = StyleSheet.create({
     padding: 10,
 
   },
-  forgot:
+  hint:
   {
+    padding: 20,
     justifyContent: 'center',
     alignItems: 'center',
     // backgroundColor: '#738F81',
-    width: 285,
+    width: 385,
     height: 60,
     // borderRadius: 35,
     alignSelf: 'center',
@@ -116,4 +120,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default SigninpassScreen;
+export default SignuppassScreen;

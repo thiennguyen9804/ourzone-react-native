@@ -21,7 +21,7 @@ const StartScreen = ({ navigation }) => {
         <Text style={styles.our}>our</Text>
         <Text style={styles.zone}>Z ne</Text>
         <View style={styles.btnContainer}>
-          <TouchableOpacity style={styles.btnsignup}>
+          <TouchableOpacity style={styles.btnsignup}onPress={() => navigation.navigate('SignupEmail')}>
             <Text style={styles.btnText}>Sign up</Text>
           </TouchableOpacity>
         </View>

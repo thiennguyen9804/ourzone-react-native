@@ -9,6 +9,9 @@ import StartScreen from './screens/StartScreen';
 import SigninEmail from './screens/SignIn/SigninemailScreen';
 import SigninPass from './screens/SignIn/SigninpassScreen';
 
+import SignupEmail from './screens/SignUp/SignupemailScreen';
+import SignupPass from './screens/SignUp/SignuppassScreen';
+import SignupName from './screens/SignUp/SignupNameScreen';
 // import { Asset } from 'expo-asset'
 import {useFonts} from 'expo-font';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
@@ -53,12 +56,15 @@ export default function App() {
           screenOptions={{
             headerShown: false,
           }}
-          initialRouteName='SigninPass'
+          initialRouteName='Start'
         
         >
+          <Stack.Screen name ="Start" component={StartScreen}/>
+          <Stack.Screen name ="SignupEmail" component={SignupEmail}/>
+          <Stack.Screen name ="SignupPass" component={SignupPass}/>
+          <Stack.Screen name ="SignupName" component={SignupName}/>
           <Stack.Screen name ="SigninPass" component={SigninPass}/>
           <Stack.Screen name ="SigninEmail" component={SigninEmail}/>
-          <Stack.Screen name ="Start" component={StartScreen}/>
           <Stack.Screen name="Camera" component={CameraScreen} />
           <Stack.Screen name="History" component={HistoryScreen} />
           
