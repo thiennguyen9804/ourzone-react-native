@@ -47,7 +47,7 @@ const CameraScreen = ({ navigation }) => {
 	})
 	const takePhoto = useCallback(async () => {
 		try {
-			if(cameraRef.current) {
+			if (cameraRef.current) {
 				const options = { quality: 0.5, base64: true, skipProcessing: true, isImageMirror: false };
 				const data = await cameraRef.current.takePictureAsync(options);
 				// if(facing === 'front') {
@@ -55,46 +55,46 @@ const CameraScreen = ({ navigation }) => {
 				// 		data.uri,
 				// 		[{rotate: 180}, {flip: FlipType.Vertical}]
 				// 	);
-	
+
 				// 	setImageUri(manipResult.uri);
 				// } else {
 				// 	setImageUri(data.uri);
 				// }
 				setImageUri(data.uri)
-				if(data.uri) {
+				if (data.uri) {
 					// console.log(imag)
 					toggleStatus();
 				}
 			}
-		} catch(error) {
+		} catch (error) {
 			console.log(error.message)
 		}
 	}, [flashMode, facing, setCaptureMode]);
 
 	const startRecord = useCallback(async () => {
-		
+
 		// console.log('capture mode: ', mutableCaptureMode);
 		try {
-			if(cameraRef.current) {
+			if (cameraRef.current) {
 				const options = { quality: '1080p', mute: true };
-				const data =  await cameraRef.current.recordAsync(options);
+				const data = await cameraRef.current.recordAsync(options);
 				setVideoUri(data.uri);
-				if(data.uri) {
+				if (data.uri) {
 					toggleStatus();
 				}
-				
+
 			}
-		} 
-		catch(error) {
+		}
+		catch (error) {
 			console.log(error.message)
 		}
-		
+
 	}, [flashMode, facing]);
 
 	const stopRecord = useCallback(() => {
 		cameraRef.current.stopRecording();
 		console.log('stop record');
-		
+
 	}, [flashMode, facing]);
 
 	const cancelHandler = () => {
@@ -116,20 +116,20 @@ const CameraScreen = ({ navigation }) => {
 
 	// ui render
 	return (
-		<Animated.View 
+		<Animated.View
 			style={styles.container}
 			entering={SlideInDown}
 			exiting={SlideOutUp}
 		>
 			<View style={styles.navSection}>
 				{/* profile */}
-				<TouchableOpacity style={[styles.navBtn, styles.avatar]}>
+				<TouchableOpacity onPress={() => navigation.navigate('Account')} style={[styles.navBtn, styles.avatar]}>
 					<Image />
 				</TouchableOpacity>
 
 				{/* friend nav */}
 				<TouchableOpacity style={styles.friendBtn}>
-					<SvgXml xml={friendIcon}/>
+					<SvgXml xml={friendIcon} />
 					<Text style={styles.friendTxt}>Friend</Text>
 				</TouchableOpacity>
 
@@ -139,15 +139,15 @@ const CameraScreen = ({ navigation }) => {
 				</TouchableOpacity>
 			</View>
 
-			
+
 			{!status ? (
 				// pre cap
 				<>
 					{/* camera */}
-					<Camera 
-						ref={cameraRef} 
-						style={styles.camera} 
-						type={facing} 
+					<Camera
+						ref={cameraRef}
+						style={styles.camera}
+						type={facing}
 						flashMode={flashMode}
 						ratio='1:1'
 					/>
@@ -159,12 +159,12 @@ const CameraScreen = ({ navigation }) => {
 						</TouchableOpacity>
 
 						{/* capture */}
-						<CaptureButton 
-							cameraRef={cameraRef} 
-							flashMode={flashMode} 
-							facing={facing} 
-							takePhoto={takePhoto} 
-							startRecord={startRecord} 
+						<CaptureButton
+							cameraRef={cameraRef}
+							flashMode={flashMode}
+							facing={facing}
+							takePhoto={takePhoto}
+							startRecord={startRecord}
 							stopRecord={stopRecord}
 							enabled={true}
 							setIsPressingButton={setIsPressingButton}
@@ -185,7 +185,7 @@ const CameraScreen = ({ navigation }) => {
 
 						{/* len changing */}
 						<TouchableOpacity onPress={toggleFacing}>
-							<SvgXml xml={flipIcon}/>
+							<SvgXml xml={flipIcon} />
 						</TouchableOpacity>
 					</View>
 
@@ -194,26 +194,26 @@ const CameraScreen = ({ navigation }) => {
 						<Text style={styles.historyTxt}>History</Text>
 					</TouchableOpacity>
 				</>
-				
+
 			) : (
 				// post cap
 				<>
 					{/* message */}
 					<View style={styles.imageSection}>
-						{imageUri && 
-							<Image source={{uri: imageUri}} style={styles.camera} />
+						{imageUri &&
+							<Image source={{ uri: imageUri }} style={styles.camera} />
 						}
-						{videoUri && 
+						{videoUri &&
 							<Video
 								style={styles.camera}
-								source={{uri: videoUri}}
+								source={{ uri: videoUri }}
 								isLooping
 								shouldPlay
 								resizeMode={ResizeMode.COVER}
 							/>
 						}
-						<View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
-							<TextInput textAlign='center' numberOfLines={1} style={styles.messageInput} onChangeText={setMessage} value={message}/>
+						<View style={{ width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center' }}>
+							<TextInput textAlign='center' numberOfLines={1} style={styles.messageInput} onChangeText={setMessage} value={message} />
 						</View>
 					</View>
 
@@ -226,13 +226,13 @@ const CameraScreen = ({ navigation }) => {
 						{/* send */}
 						<TouchableOpacity style={styles.captureBtn} onPress={takePhoto}>
 							<View style={styles.cameraBtnInner}>
-								<SvgXml style={{margin: 'auto'}} xml={sendIcon}/>
+								<SvgXml style={{ margin: 'auto' }} xml={sendIcon} />
 							</View>
 						</TouchableOpacity>
 
 						{/* saving */}
 						<TouchableOpacity onPress={toggleFacing}>
-							<SvgXml xml={flipIcon}/>
+							<SvgXml xml={flipIcon} />
 						</TouchableOpacity>
 					</View>
 				</>

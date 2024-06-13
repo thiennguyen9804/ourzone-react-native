@@ -1,5 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View } from 'react-native';
+import React from 'react';
+import { StyleSheet } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CameraScreen from './screens/CameraScreen';
@@ -11,43 +12,27 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <StatusBar />
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName='Camera'
-
-
-      >
-        <Stack.Screen name="Camera" component={CameraScreen} />
-        <Stack.Screen name="History" component={HistoryScreen} />
-        <Stack.Screen name="Account" component={AccountScreen} />
-      </Stack.Navigator>
-      <GestureHandlerRootView>
-
+    <GestureHandlerRootView style={styles.container}>
+      <NavigationContainer>
+        <StatusBar style="auto" />
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
           }}
           initialRouteName='Camera'
-
         >
           <Stack.Screen name="Camera" component={CameraScreen} />
           <Stack.Screen name="History" component={HistoryScreen} />
+          <Stack.Screen name="Account" component={AccountScreen} />
         </Stack.Navigator>
-      </GestureHandlerRootView>
-    </NavigationContainer>
+      </NavigationContainer>
+    </GestureHandlerRootView>
   );
-
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
   },
 });
