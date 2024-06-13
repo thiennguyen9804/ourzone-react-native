@@ -24,7 +24,7 @@ const SigninemailScreen=({ navigation })=>{
       />
            </View>
            <TouchableOpacity style={styles.btncontinue}>
-            <Text style={styles.text}> Continue</Text>
+            <Text style={styles.text}>Continue</Text>
           </TouchableOpacity>
         </SafeAreaView>
         </ImageBackground>
@@ -70,7 +70,8 @@ const styles = StyleSheet.create({
         marginTop:25,
         display: 'flex',
 		justifyContent: 'center',
-        backgroundColor:'#ffffff'
+        backgroundColor:'#ffffff',
+        fontSize:17,
       },
       btncontinue:
       {

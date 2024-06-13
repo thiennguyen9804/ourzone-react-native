@@ -7,7 +7,7 @@ import HistoryScreen from './screens/HistoryScreen';
 import StartScreen from './screens/StartScreen';
 
 import SigninEmail from './screens/SignIn/SigninemailScreen';
-
+import SigninPass from './screens/SignIn/SigninpassScreen';
 
 // import { Asset } from 'expo-asset'
 import {useFonts} from 'expo-font';
@@ -53,10 +53,11 @@ export default function App() {
           screenOptions={{
             headerShown: false,
           }}
-          initialRouteName='SigninEmail'
+          initialRouteName='SigninPass'
         
         >
-                 <Stack.Screen name ="SigninEmail" component={SigninEmail}/>
+          <Stack.Screen name ="SigninPass" component={SigninPass}/>
+          <Stack.Screen name ="SigninEmail" component={SigninEmail}/>
           <Stack.Screen name ="Start" component={StartScreen}/>
           <Stack.Screen name="Camera" component={CameraScreen} />
           <Stack.Screen name="History" component={HistoryScreen} />
