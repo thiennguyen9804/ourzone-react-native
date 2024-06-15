@@ -33,7 +33,7 @@
     },
     "plugins": [
       "expo-video",
-      "react-native-vision-camera",
+      "expo-font",
       [
         "react-native-vision-camera",
         {
@@ -47,9 +47,6 @@
       "eas": {
         "projectId": "e35f170d-6e9b-4818-bea6-c9ba90d0f76a"
       }
-    },
-
-      "expo-font"
-    ]
+    }
   }
 }

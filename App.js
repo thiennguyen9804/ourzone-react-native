@@ -8,7 +8,19 @@ import AccountScreen from './screens/AccountScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import StartScreen from './screens/StartScreen';
 
-import {useFonts} from 'expo-font'
+import SigninEmail from './screens/SignIn/SigninemailScreen';
+import SigninPass from './screens/SignIn/SigninpassScreen';
+
+import SignupEmail from './screens/SignUp/SignupemailScreen';
+import SignupPass from './screens/SignUp/SignuppassScreen';
+import SignupName from './screens/SignUp/SignupNameScreen';
+// import { Asset } from 'expo-asset'
+import {useFonts} from 'expo-font';
+
+import * as SplashScreen from 'expo-splash-screen';
+import {useEffect} from 'react';
+
+
 
 const Stack = createNativeStackNavigator();
 
@@ -19,34 +31,44 @@ export default function App() {
     OpenSansBold: require('./assets/fonts/OpenSans-Bold.ttf'),
     OtomanopeeOne: require('./assets/fonts/OtomanopeeOne-Regular.ttf'),
   })
+  useEffect(()=>{
+    async function prepare(){
+      await SplashScreen.preventAutoHideAsync();
+    }
+    prepare();
+  }, [])
+
+  if(!fontsLoaded)
+    {
+      return undefined;
+    }
+    else 
+    {
+      SplashScreen.hideAsync();
+    }
 
   return (
     <NavigationContainer>
       <StatusBar />
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-        }}
-        initialRouteName='Start'
 
-
-      >
-        <Stack.Screen name ="Start" component={StartScreen}/>
-        <Stack.Screen name="Camera" component={CameraScreen} />
-        <Stack.Screen name="History" component={HistoryScreen} />
-        <Stack.Screen name="Account" component={AccountScreen} />
-      </Stack.Navigator>
       <GestureHandlerRootView>
-
+        
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
           }}
-          initialRouteName='Camera'
-
+          initialRouteName='Start'
+        
         >
+          <Stack.Screen name ="Start" component={StartScreen}/>
+          <Stack.Screen name ="SignupEmail" component={SignupEmail}/>
+          <Stack.Screen name ="SignupPass" component={SignupPass}/>
+          <Stack.Screen name ="SignupName" component={SignupName}/>
+          <Stack.Screen name ="SigninPass" component={SigninPass}/>
+          <Stack.Screen name ="SigninEmail" component={SigninEmail}/>
           <Stack.Screen name="Camera" component={CameraScreen} />
           <Stack.Screen name="History" component={HistoryScreen} />
+          
         </Stack.Navigator>
       </GestureHandlerRootView>
     </NavigationContainer>
