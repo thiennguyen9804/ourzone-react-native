@@ -4,8 +4,8 @@
   "main": "expo/AppEntry.js",
   "scripts": {
     "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "web": "expo start --web"
   },
   "dependencies": {
@@ -28,8 +28,13 @@
     "react-native-linear-gradient": "^2.8.3",
     "react-native-reanimated": "^3.10.1",
     "react-native-svg": "^15.3.0",
+<<<<<<< HEAD
     "react-native-svg-transformer": "^1.4.0",
     "react-native-view-shot": "3.8.0"
+=======
+    "react-native-view-shot": "3.8.0",
+    "react-native-vision-camera": "^4.0.5"
+>>>>>>> cb2ff369f9b4f853f05cb7f12f1a9afc36af7ffc
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
