@@ -5,27 +5,34 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import CameraScreen from './screens/CameraScreen';
 import HistoryScreen from './screens/HistoryScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
+import store from './stores/store'
+import { Provider } from 'react-redux';
+import ApplicationContext from './contexts/ApplicationContext';
 
 const Stack = createNativeStackNavigator();
 
+
 export default function App() {
   return (
-    <NavigationContainer>
-      <StatusBar />
-      <GestureHandlerRootView>
-        
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-          }}
-          initialRouteName='Camera'
-        
-        >
-          <Stack.Screen name="Camera" component={CameraScreen} />
-          <Stack.Screen name="History" component={HistoryScreen} />
-        </Stack.Navigator>
-      </GestureHandlerRootView>
-    </NavigationContainer>
+    <Provider store={store}>
+      <ApplicationContext>
+        <NavigationContainer>
+          <StatusBar />
+          <GestureHandlerRootView>
+            <Stack.Navigator
+              screenOptions={{
+                headerShown: false,
+              }}
+              initialRouteName='Camera'
+            >
+              <Stack.Screen name="Camera" component={CameraScreen} />
+              <Stack.Screen name="History" component={HistoryScreen} />
+            </Stack.Navigator>
+          </GestureHandlerRootView>
+        </NavigationContainer>
+      </ApplicationContext>
+    </Provider>
+      
   );
 
 }

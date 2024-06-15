@@ -1,9 +1,10 @@
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { Pressable, StyleSheet } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 
-const PostVideo = () => {
+const PostVideo = ({ pressHandler, index }) => {
   return (
+	<Pressable onPress={() => pressHandler(index)} style={styles.image}>
 		<Video
 			style={styles.image}
 			source={require('../assets/Kiana Video.mp4')}
@@ -11,6 +12,7 @@ const PostVideo = () => {
 			resizeMode={ResizeMode.COVER}
 			shouldPlay
 		/>
+	</Pressable>
 	);
 }
 
