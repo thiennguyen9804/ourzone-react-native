@@ -64,7 +64,7 @@ const AccountScreen = ({ navigation }) => {
                     <Text style={styles.textTopic}>Theme</Text>
                 </View>
 
-                <TouchableOpacity style={styles.btnNormal}>
+                <TouchableOpacity style={styles.btnNormal} onPress={() => navigation.navigate('ChangeTheme')}>
                     <View style={styles.startSection}>
                         <SvgXml style={styles.icon} xml={iconChangeTheme}></SvgXml>
                         <Text style={styles.textInBtn}>Change Theme</Text>
@@ -77,7 +77,7 @@ const AccountScreen = ({ navigation }) => {
                     <Text style={styles.textTopic}>General</Text>
                 </View>
 
-                <TouchableOpacity style={styles.btnStart}>
+                <TouchableOpacity style={styles.btnStart} onPress={() => navigation.navigate('ChangePhoneNumber')}>
                     <View style={styles.startSection}>
                         <SvgXml style={styles.icon} xml={iconChangePhoneNumber}></SvgXml>
                         <Text style={styles.textInBtn}>Change Phone Numbers</Text>
@@ -85,7 +85,7 @@ const AccountScreen = ({ navigation }) => {
                     <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnMid}>
+                <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangeEmail')}>
                     <View style={styles.startSection}>
                         <SvgXml style={styles.icon} xml={iconChangeEmail}></SvgXml>
                         <Text style={styles.textInBtn}>Change Email Address</Text>
@@ -93,7 +93,7 @@ const AccountScreen = ({ navigation }) => {
                     <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnMid}>
+                <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangePassword')}>
                     <View style={styles.startSection}>
                         <SvgXml style={styles.icon} xml={iconChangePassword}></SvgXml>
                         <Text style={styles.textInBtn}>Change Password</Text>
@@ -109,7 +109,7 @@ const AccountScreen = ({ navigation }) => {
                     <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
                 </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnEnd}>
+                <TouchableOpacity style={styles.btnEnd} onPress={() => navigation.navigate('Report')}>
                     <View style={styles.startSection}>
                         <SvgXml style={styles.icon} xml={iconReport}></SvgXml>
                         <Text style={styles.textInBtn}>Report Problem</Text>
