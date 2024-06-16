@@ -33,7 +33,7 @@
     },
     "plugins": [
       "expo-video",
-      "react-native-vision-camera",
+      "expo-font",
       [
         "react-native-vision-camera",
         {
