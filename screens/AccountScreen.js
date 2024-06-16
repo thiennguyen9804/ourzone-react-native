@@ -52,7 +52,7 @@ const AccountScreen = ({ navigation }) => {
                     <Text style={styles.textName}>Toi da khoc vi dl.!</Text>
                 </View>
 
-                <TouchableOpacity style={styles.btnChangeName}>
+                <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>
                     <Text style={{
                         fontSize: 20, fontWeight: "700", letterSpacing: 0.7, color: "white",
                         alignContent: "center", marginHorizontal: "auto", marginVertical: "auto"

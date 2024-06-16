@@ -11,6 +11,7 @@ import ChangePhoneNumberScreen from './screens/changeInfo/ChangePhoneNumberScree
 import ChangePasswordScreen from './screens/changeInfo/ChangePasswordScreen';
 import ChangeThemeScreen from './screens/changeInfo/ChangeThemeScreen';
 import ReportScreen from './screens/changeInfo/ReportScreen';
+import ChangeNameScreen from './screens/changeInfo/ChangeNameScreen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 
 const Stack = createNativeStackNavigator();
@@ -34,6 +35,7 @@ export default function App() {
           <Stack.Screen name="ChangePhoneNumber" component={ChangePhoneNumberScreen} />
           <Stack.Screen name="ChangeTheme" component={ChangeThemeScreen} />
           <Stack.Screen name="Report" component={ReportScreen} />
+          <Stack.Screen name="ChangeName" component={ChangeNameScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </GestureHandlerRootView>

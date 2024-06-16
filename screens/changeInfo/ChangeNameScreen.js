@@ -7,7 +7,9 @@ import { TextInput } from 'react-native-gesture-handler';
 import iconBack from "../../assets/back-icon";
 
 const ChangeEmailScreen = ({ navigation }) => {
-    const [text, setText] = useState('');
+    const [firstName, setFirstName] = useState('');
+    const [lastName, setLastName] = useState('');
+
     return (
         <Animated.View
             style={styles.container}
@@ -21,13 +23,19 @@ const ChangeEmailScreen = ({ navigation }) => {
             <View style={styles.frmTopic}>
                 <Text style={styles.textTopic}
 
-                >Enter Your Email</Text>
+                >Enter Your Name</Text>
             </View>
 
             <TextInput style={styles.frmEdit}
-                placeholder="Enter your Email"
-                value={text}
-                onChange={setText} ></TextInput>
+                placeholder="First Name"
+                value={firstName}
+                onChange={setFirstName} ></TextInput>
+
+            <TextInput style={styles.frmEdit}
+                placeholder="Last Name"
+                value={lastName}
+                onChange={setLastName} ></TextInput>
+
 
 
             <TouchableOpacity style={styles.btnSave}>
@@ -64,7 +72,7 @@ const styles = StyleSheet.create({
     frmTopic: {
         alignContent: "center",
         marginHorizontal: "auto",
-        marginVertical: 300,
+        marginVertical: 240,
         marginBottom: 25
     },
 
@@ -90,6 +98,7 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         color: "#626262",
         letterSpacing: 3,
+        marginBottom: 10
     },
 
     btnSave: {
@@ -98,7 +107,7 @@ const styles = StyleSheet.create({
         borderRadius: 50,
         backgroundColor: "#738F81",
         marginHorizontal: "auto",
-        marginTop: 40,
+        marginTop: 30,
         alignItems: "center",
     },
 
