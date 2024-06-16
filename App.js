@@ -57,6 +57,8 @@ export default function App() {
   }
 
   return (
+    <Provider store={store}>
+      <ApplicationContext>
     <NavigationContainer>
       <StatusBar />
       <GestureHandlerRootView>
@@ -68,26 +70,28 @@ export default function App() {
           initialRouteName='Camera'
         >
        <Stack.Screen name="Start" component={StartScreen} />
-              <Stack.Screen name="SignupEmail" component={SignupEmail} />
-              <Stack.Screen name="SignupPass" component={SignupPass} />
-              <Stack.Screen name="SignupName" component={SignupName} />
-              <Stack.Screen name="SigninPass" component={SigninPass} />
-              <Stack.Screen name="SigninEmail" component={SigninEmail} />
-              <Stack.Screen name="Camera" component={CameraScreen} />
-              <Stack.Screen name="History" component={HistoryScreen} />
-              <Stack.Screen name="Account" component={AccountScreen} />
-              <Stack.Screen name="ChangeEmail" component={ChangeEmailScreen} />
-              <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
-              <Stack.Screen name="ChangePhoneNumber" component={ChangePhoneNumberScreen} />
-              <Stack.Screen name="ChangeTheme" component={ChangeThemeScreen} />
-              <Stack.Screen name="Report" component={ReportScreen} />
-              <Stack.Screen name="ChangeName" component={ChangeNameScreen} />
-          <Stack.Screen name="Friend" component={FriendScreen} />
-          <Stack.Screen name="Confirm" component={ConfirmDialog} />
+        <Stack.Screen name="SignupEmail" component={SignupEmail} />
+        <Stack.Screen name="SignupPass" component={SignupPass} />
+        <Stack.Screen name="SignupName" component={SignupName} />
+        <Stack.Screen name="SigninPass" component={SigninPass} />
+        <Stack.Screen name="SigninEmail" component={SigninEmail} />
+        <Stack.Screen name="Camera" component={CameraScreen} />
+        <Stack.Screen name="History" component={HistoryScreen} />
+        <Stack.Screen name="Account" component={AccountScreen} />
+        <Stack.Screen name="ChangeEmail" component={ChangeEmailScreen} />
+        <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+        <Stack.Screen name="ChangePhoneNumber" component={ChangePhoneNumberScreen} />
+        <Stack.Screen name="ChangeTheme" component={ChangeThemeScreen} />
+        <Stack.Screen name="Report" component={ReportScreen} />
+        <Stack.Screen name="ChangeName" component={ChangeNameScreen} />
+        <Stack.Screen name="Friend" component={FriendScreen} />
+        <Stack.Screen name="Confirm" component={ConfirmDialog} />
 
         </Stack.Navigator>
       </GestureHandlerRootView>
     </NavigationContainer>
+    </ApplicationContext>
+    </Provider>
   );
 
 }

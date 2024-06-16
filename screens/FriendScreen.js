@@ -78,7 +78,6 @@ const FriendsScreen = ({ navigation }) => {
                 <UserFriendCard
                   username={item.username}
                   navigation={navigation} 
-
                 />
               )}
               keyExtractor={(item) => item.id}
