@@ -8,6 +8,8 @@ import { Video, ResizeMode } from 'expo-av';
 import { manipulateAsync, FlipType } from 'expo-image-manipulator';
 import Animated, { SlideInDown, SlideInLeft, SlideInUp, SlideOutRight, SlideOutUp, useSharedValue } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
+import { useApplicationContext } from '../hooks/useApplicationContext';
+
 // widgets
 import CaptureButton from '../widgets/CaptureButton';
 
@@ -20,6 +22,7 @@ import flashOffIcon from '../assets/flash-off-icon';
 import cancelIcon from '../assets/cancel-icon';
 import sendIcon from '../assets/send-icon';
 import cameraIcon from '../assets/camera-icon';
+import { useSelector } from 'react-redux';
 
 const CameraScreen = ({ navigation }) => {
 	// variables
@@ -50,6 +53,7 @@ const CameraScreen = ({ navigation }) => {
 			if (cameraRef.current) {
 				const options = { quality: 0.5, base64: true, skipProcessing: true, isImageMirror: false };
 				const data = await cameraRef.current.takePictureAsync(options);
+
 				// if(facing === 'front') {
 				// 	const manipResult = await manipulateAsync(
 				// 		data.uri,
@@ -60,6 +64,8 @@ const CameraScreen = ({ navigation }) => {
 				// } else {
 				// 	setImageUri(data.uri);
 				// }
+
+
 				setImageUri(data.uri)
 				if (data.uri) {
 					// console.log(imag)
@@ -172,16 +178,6 @@ const CameraScreen = ({ navigation }) => {
 							setCaptureMode={setCaptureMode}
 						/>
 
-						{/* <GestureDetector gesture={composed}>
-							<View style={styles.captureBtn}>
-								<View style={styles.cameraBtnInner}>
-									<SvgXml style={{margin: 'auto'}} xml={cameraIcon}/>
-								</View>
-							</View>
-						</GestureDetector> */}
-
-						{/* <Button onPress={() => startRecord()} title='start' />
-						<Button onPress={() => stopRecord()} title='stop' /> */}
 
 						{/* len changing */}
 						<TouchableOpacity onPress={toggleFacing}>

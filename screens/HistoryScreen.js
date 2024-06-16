@@ -2,11 +2,14 @@
 import { FlatList, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import Animated, { SlideInDown, SlideInUp, SlideOutDown, SlideOutUp } from "react-native-reanimated";
 import { SvgXml } from "react-native-svg";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect, useLayoutEffect } from "react";
 import PostVideoDetail from "../components/PostVideoDetail";
 import PostImageDetail from "../components/PostImageDetail";
 import PostImage from '../components/PostImage';
 import PostVideo from "../components/PostVideo";
+import { useApplicationContext } from "../hooks/useApplicationContext";
+import { usePost } from "../hooks/usePost";
+import { useUser } from "../hooks/useUser";
 
 // icons
 import backIcon from "../assets/back-icon";
@@ -16,62 +19,35 @@ import gridIcon from "../assets/grid-icon";
 import shareIcon from "../assets/share-icon"
 
 
-const posts = [
-	{
-		id: 1,
-		uri: '../assets/Kiana.jpg',
-		type: 'video',
-		userAvatar: '../assets/Kiana Avatar.jpg'
-	},
-	{
-		id: 2,
-		uri: '../assets/Kiana.jpg',
-		type: 'image',
-		userAvatar: '../assets/Kiana Avatar.jpg'
-	},
-	{
-		id: 3,
-		uri: '../assets/Kiana.jpg',
-		type: 'image',
-		userAvatar: '../assets/Kiana Avatar.jpg'
-	},
-	{
-		id: 4,
-		uri: '../assets/Kiana.jpg',
-		type: 'video',
-		userAvatar: '../assets/Kiana Avatar.jpg'
-	},
-	{
-		id: 5,
-		uri: '../assets/Kiana.jpg',
-		type: 'video',
-		userAvatar: '../assets/Kiana Avatar.jpg'
-	},
-	{
-		id: 6,
-		uri: '../assets/Kiana Avatar.jpg',
-		type: 'image',
-		userAvatar: '../assets/Kiana Avatar.jpg'
-	},
-]
-
 const HistoryScreen = ({ navigation }) => {
+	const { postIds, setPostIds, newsfeed } = useApplicationContext();
 	const [isFriendsOpen, setIsFriendsOpen] = useState(false);
 	const [isGrid, setIsGrid] = useState(false);
-	const [postActiveId, setPostActiveId] = useState(posts[0].id);
-
+	const [postActiveId, setPostActiveId] = useState(postIds[0]);
+	const [postActiveIndex, setPostActiveIndex] = useState(0);
+	const linearListRef = useRef();
 	const toggleFriendsOpen = () => setIsFriendsOpen(curr => !curr);
-	const toggleIsGrid = () => setIsGrid(curr => !curr);
-	const viewabilityConfigCallbackPairs = useRef([
-		{
-			viewabilityConfig: { itemVisiblePercentThreshold: 100 },
-			onViewableItemsChanged: ({changed, viewableItems}) => {
-				if(viewableItems.length > 0 && viewableItems[0].isViewable) {
-					setPostActiveId(viewableItems[0].item.id)
-				}
-			}
-		}
-	]);
+	const toggleIsGrid = () => {
+		setIsGrid(curr => !curr);
+	}
+	// const viewabilityConfigCallbackPairs = useRef([
+	// 	{
+	// 		viewabilityConfig: { itemVisiblePercentThreshold: 100 },
+	// 		onViewableItemsChanged: ({changed, viewableItems}) => {
+	// 			if(viewableItems.length > 0 && viewableItems[0].isViewable) {
+	// 				setPostActiveId(viewableItems[0].item.id);
+	// 				setPostActiveIndex(viewableItems[0].index)
+	// 			}
+	// 		}
+	// 	}
+	// ]);
+
+	const pressHandler = (index) => {
+		// toggleIsGrid();
+		// linearListRef.current.scrollToIndex({index: index, animated: false});
+		console.log(index);
+	}
+
 
 	return (
 		<Animated.View
@@ -97,43 +73,47 @@ const HistoryScreen = ({ navigation }) => {
 				</TouchableOpacity>
 			</View>
 
-			{!isGrid ? (
-				<FlatList
-					key={isGrid}
-					style={styles.list}
-					data={posts}
-					renderItem={({item}) => (
-						item.type === 'image' ? (
-							<PostImageDetail id={item.id} uri={item.uri} postActiveId={postActiveId}/>
-						) : (
-							<PostVideoDetail id={item.id} uri={item.uri} postActiveId={postActiveId}/>
-						)
-					)}
-					numColumns={1}
-					showsVerticalScrollIndicator={false}
-					showsHorizontalScrollIndicator={false}
-					pagingEnabled
-					viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
-				/>
-			) : (
-				<FlatList
-					key={isGrid}
-					style={[styles.list, {marginTop: 140}]}
-					data={posts}
-					renderItem={({item}) => (
-						item.type === 'image' ? (
-							<PostImage />
-						) : (
-							<PostVideo />
-						)
-					)}
-					numColumns={3}
-					horizontal={false}
-					showsVerticalScrollIndicator={false}
-					showsHorizontalScrollIndicator={false}
-				/>
-			)}
+			{/* for linear layout */}
+			<FlatList
+				ref={linearListRef}
+				style={[styles.list, (isGrid && {display: 'none'})]}
+				data={postIds}
+				renderItem={({item}) => (
+					(item.type === 'image' || !item.type) ? (
+						<PostImageDetail postId={item} postActiveId={postActiveId}/>
+					) : (
+						<PostVideoDetail postId={item} postActiveId={postActiveId}/>
+					)
+				)}
+				numColumns={1}
+				showsVerticalScrollIndicator={false}
+				showsHorizontalScrollIndicator={false}
+				pagingEnabled
+				keyExtractor={(item, index) => (`${item} ${index} ${isGrid}`)}
+			/>
 
+			{/* for grid layout */}
+			<FlatList
+				style={[styles.list, {marginTop: 140}, (!isGrid && {display: 'none'})]}
+				data={postIds}
+				renderItem={({ item, index }) => (
+					(item.type === 'image' || !item.type) ? (
+						<PostImage 
+							postId={item} postActiveId={postActiveId}
+							pressHandler={pressHandler} index={index}
+						/>
+					) : (
+						
+						<PostVideo pressHandler={pressHandler} index={index} />
+					)
+				)}
+				numColumns={3}
+				horizontal={false}
+				showsVerticalScrollIndicator={false}
+				showsHorizontalScrollIndicator={false}
+				keyExtractor={(item, index) => (`${item} ${index} ${isGrid}`)}
+			/>
+			
 			{/* footer buttons */}
 			<View style={styles.footerSection}>
 				{/* grid */}
