@@ -1,17 +1,54 @@
-import { Image, StyleSheet, View, Text, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, View, Text, useWindowDimensions, TextInput } from 'react-native';
 
 import { formatDistanceStrict } from 'date-fns';
+import { useEffect, useState } from 'react';
+import { useUser } from '../hooks/useUser';
+import { usePost } from '../hooks/usePost';
+import { formatDistanceToNowStrict } from 'date-fns/formatDistanceToNowStrict';
 
-export default function PostImageDetail({ id, uri, userAvatar }) {
-	
+export default function PostImageDetail({postId}) {
+	const [currentUser, setCurrentUser] = useState({});
+	const [currentPost, setCurrentPost] = useState({});
+	const { getUserByUserId } = useUser();
+	const { getPostByPostId } = usePost();
+	useEffect(() => {
+		(async () => {
+			try {
+				let currentPostValue = await getPostByPostId(postId).catch(reason => console.log(reason));
+				setCurrentPost(currentPostValue);
+			} catch(err) {
+				console.log(err);
+			}
+		})();
+	}, [setCurrentPost]);
+
+	useEffect(() => {
+		(async () => {
+			try {
+				let currentUserValue = await getUserByUserId(currentPost.userId);
+				setCurrentUser(currentUserValue);
+			} catch(err) {
+				console.log(err.message);
+			}
+
+		})();
+	}, [setCurrentUser, currentPost]);
+
 	const { height } = useWindowDimensions();
+	// console.log('currentPost', currentPost);
+	// console.log('currentUser', currentUser);
+	// console.log('createdAt: ', currentPost.createdAt, new Date(currentPost.createdAt.seconds * 1000));
 	return (
 		<View style={[styles.container, { height }]}>
 			{/* image  */}
 			<View style={styles.imageContainer}>
 				<View style={styles.innerImageContainer}>
-					<Image style={styles.image} resizeMode='cover' source={require('../assets/Kiana.jpg')}/>
+					<Image style={styles.image} resizeMode='cover' source={{uri: currentPost.image}}/>
+					<View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
+						<TextInput multiline textAlign='center' style={styles.messageInput} editable={false} value={currentPost.content}/>
+					</View>
 				</View>
+				
 			</View>
 
 			{/* user  */}
@@ -19,15 +56,15 @@ export default function PostImageDetail({ id, uri, userAvatar }) {
 				{/* avatar */}
 				<View style={styles.avatarContainer}>
 					<View style={styles.innerImageContainer}>
-						<Image style={styles.image} resizeMode='cover' source={require('../assets/Kiana Avatar.jpg')}/>
+						<Image style={styles.image} resizeMode='cover' source={{uri: currentUser.avatar}}/>
 					</View>
 				</View>
 
 				{/* name */}
-				<Text style={styles.userName}>Kiana</Text>
+				<Text style={styles.userName}>{`${currentUser.firstName} ${currentUser.lastName}`}</Text>
 
 				{/* time */}
-				{/* <Text style={styles.timeTxt}>{formatDistanceStrict(new Date('2024-05-30'), new Date())}</Text>	 */}
+				{/* <Text style={styles.timeTxt}>{formatDistanceToNowStrict(new Date((currentPost.createdAt.seconds * 1000) || 0))}</Text>	 */}
 			</View>
 		</View>
 	);
@@ -93,5 +130,17 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		fontSize: 12,
 
-	}
+	},
+
+	messageInput: {
+		borderRadius: 18,
+		fontWeight: 'bold',
+		backgroundColor: '#fff',
+		letterSpacing: 1.2,
+		borderWidth: 5,
+		borderColor: '#fff',
+		paddingHorizontal: 10,
+		paddingVertical: 3,
+		fontSize: 16,
+	},
 })

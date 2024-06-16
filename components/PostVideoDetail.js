@@ -5,7 +5,6 @@ import { useRef, useEffect } from 'react';
 import { formatDistanceStrict } from 'date-fns';
 
 export default function PostVideoDetail({ id, uri, userAvatar, postActiveId }) {
-	console.log(postActiveId)
 	const videoRef = useRef();
 	useEffect(() => {
 		if(postActiveId !== id) {
@@ -28,7 +27,6 @@ export default function PostVideoDetail({ id, uri, userAvatar, postActiveId }) {
 						source={require('../assets/Kiana Video.mp4')}
 						isLooping
 						resizeMode={ResizeMode.COVER}
-						
 					/>
 				</View>
 			</View>
