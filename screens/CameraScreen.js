@@ -128,7 +128,9 @@ const CameraScreen = ({ navigation }) => {
 				</TouchableOpacity>
 
 				{/* friend nav */}
-				<TouchableOpacity style={styles.friendBtn}>
+				<TouchableOpacity
+				style={styles.friendBtn}
+				onPress={() => navigation.navigate('Friend')}>
 					<SvgXml xml={friendIcon}/>
 					<Text style={styles.friendTxt}>Friend</Text>
 				</TouchableOpacity>
