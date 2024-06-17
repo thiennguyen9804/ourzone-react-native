@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 
-const UserSearchCard = ({ username, navigation }) => {
+
+const UserSearchCard = ({ username }) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
 
   const handleCardPress = () => {
@@ -16,7 +17,7 @@ const UserSearchCard = ({ username, navigation }) => {
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         <View style={styles.avatarOuter}>
-          <Image style={styles.avatar} />
+          <Image style={styles.avatar} source={require('../assets/avatar-picture.jpg') }/>
         </View>
       </View>
       <TouchableOpacity style={styles.usernameButton}>
@@ -81,6 +82,10 @@ const styles = StyleSheet.create({
   avatar: {
     width: 47,
     height: 47,
+    justifyContent: 'center',
+    alignItems: 'center',
+    width: '100%',
+    height: '100%',
     borderRadius: 40,
   },
   usernameButton: {

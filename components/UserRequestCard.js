@@ -17,7 +17,7 @@ const UserRequestCard = ({ username, navigation }) => {
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         <View style={styles.avatarOuter}>
-              <Image  style={styles.avatar} />
+        <Image style={styles.avatar} source={require('../assets/avatar-picture.jpg') }/>
             </View>
       </View>
       <TouchableOpacity style={styles.usernameButton}>
