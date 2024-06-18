@@ -5,10 +5,10 @@ import backIcon from '../../assets/back-icon';
 import hideIcon from '../../assets/eyehide-icon';
 import showIcon from '../../assets/eye-icon';
 
-const SignuppassScreen = ({ navigation }) => {
-  const [text, onChangeText] = useState('');
+const SignuppassScreen = ({ navigation, route }) => {
+  const [password, setPassword] = useState('');
   const [isSecureEntry, setIsSecureEntry] = useState(true);
-
+  const { email } = route.params;
   return (
     <ImageBackground style={styles.background}>
       <StatusBar barStyle="dark-content" />
@@ -20,11 +20,11 @@ const SignuppassScreen = ({ navigation }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={onChangeText}
+            onChangeText={setPassword}
             textContentType='password'
             secureTextEntry={isSecureEntry}
             placeholder="Your password..."
-            value={text}
+            value={password}
           />
           <TouchableOpacity style={styles.toggle} onPress={() => setIsSecureEntry(prev => !prev)}>
             <SvgXml  style={{width: 21,height: 21}} xml={isSecureEntry ? showIcon : hideIcon} />
@@ -36,7 +36,7 @@ const SignuppassScreen = ({ navigation }) => {
         <Text style={{ color: '#738F81', fontFamily: 'OpenSansBold' }}> 8 characters</Text>
       </Text>
     </View>
-        <TouchableOpacity style={styles.btnContinue} onPress={() => navigation.navigate('SignupName')}>
+        <TouchableOpacity style={styles.btnContinue} onPress={() => navigation.navigate('SignupName',  { email, password })}>
           <Text style={styles.text}>Continue</Text>
         </TouchableOpacity>
         

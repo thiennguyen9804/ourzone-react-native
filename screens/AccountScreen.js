@@ -1,10 +1,12 @@
-import React from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Touchable } from 'react-native';
-import Animated, { SlideInDown, SlideInUp, SlideOutDown, SlideOutUp } from "react-native-reanimated";
-import { Gesture, GestureDetector, ScrollView } from 'react-native-gesture-handler';
+import React, { useState, useEffect } from 'react';
+import { StyleSheet, View, Text, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
+import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { doc, getDoc } from 'firebase/firestore';
+import { auth, db } from '../firebase'; 
 
-//icon
+// Icons
 import iconBack from "../assets/back-icon";
 import iconChangeAvatar from "../assets/change-avatar-icon";
 import iconTheme from "../assets/theme-icon";
@@ -26,167 +28,196 @@ import iconManager from "../assets/manage-icon";
 import iconSignOut from "../assets/sign-out-icon";
 import iconDeleteAcc from "../assets/delete-acc-icon";
 
-
 const AccountScreen = ({ navigation }) => {
-    return (
-        <Animated.View
-            style={styles.container}
-            entering={SlideInDown}
-            exiting={SlideOutDown}
-        >
-            <View>
-                <TouchableOpacity style={styles.btnBack} onPress={() => navigation.navigate('Camera')}>
-                    <SvgXml style={styles.iconBack} xml={iconBack}></SvgXml>
-                </TouchableOpacity>
-            </View>
+  const [userData, setUserData] = useState(null);
 
-            <ScrollView style={styles.containerScrollView} >
-                <View style={styles.bgAvatar} >
-                    <Image style={styles.imgAvatar} source={require('../assets/avatar-picture.jpg')} />
-                </View>
-                <TouchableOpacity style={styles.btnChangeAvatar}>
-                    <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
-                </TouchableOpacity>
+  useEffect(() => {
+    const fetchUserData = async (user) => {
+      try {
+        const userDoc = await getDoc(doc(db, 'user', user.uid));
+        if (userDoc.exists()) {
+          setUserData(userDoc.data());
+        } else {
+          Alert.alert("Error", "No user data found");
+        }
+      } catch (error) {
+        console.error("Error fetching user data: ", error);
+        Alert.alert("Error", "Failed to fetch user data. Please try again.");
+      }
+    };
 
-                <View style={styles.frmName}>
-                    <Text style={styles.textName}>Toi da khoc vi dl.!</Text>
-                </View>
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        fetchUserData(user);
+      } else {
+        Alert.alert("Error", "Failed to fetch user data. Please try again.");
+        navigation.navigate('Start'); 
+      }
+    });
 
-                <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>
-                    <Text style={{
+    return () => unsubscribe();
+  }, [navigation]);
+
+  if (!userData) {
+    return null; 
+  }
+
+  return (
+    <Animated.View
+      style={styles.container}
+      entering={SlideInDown}
+      exiting={SlideOutDown}
+    >
+      <View>
+        <TouchableOpacity style={styles.btnBack} onPress={() => navigation.navigate('Camera')}>
+          <SvgXml style={styles.iconBack} xml={iconBack}></SvgXml>
+        </TouchableOpacity>
+      </View>
+
+      <ScrollView style={styles.containerScrollView} >
+        <View style={styles.bgAvatar} >
+          <Image style={styles.imgAvatar} source={{ uri: userData.avatar }} />
+        </View>
+        <TouchableOpacity style={styles.btnChangeAvatar}>
+          <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
+        </TouchableOpacity>
+
+        <View style={styles.frmName}>
+          <Text style={styles.textName}>{userData.firstName} {userData.lastName}</Text>
+        </View>
+
+        <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>
+          <Text style={{
                         fontSize: 20, fontWeight: "700", letterSpacing: 0.7, color: "white",
                         alignContent: "center", marginHorizontal: "auto", marginVertical: "auto"
-                    }}>Edit Info</Text>
-                </TouchableOpacity>
+          }}>Edit Info</Text>
+        </TouchableOpacity>
 
-                <View style={styles.frmTopic}>
-                    <SvgXml style={styles.icon} xml={iconTheme}></SvgXml>
-                    <Text style={styles.textTopic}>Theme</Text>
-                </View>
+        <View style={styles.frmTopic}>
+          <SvgXml style={styles.icon} xml={iconTheme}></SvgXml>
+          <Text style={styles.textTopic}>Theme</Text>
+        </View>
 
-                <TouchableOpacity style={styles.btnNormal} onPress={() => navigation.navigate('ChangeTheme')}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconChangeTheme}></SvgXml>
-                        <Text style={styles.textInBtn}>Change Theme</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnNormal} onPress={() => navigation.navigate('ChangeTheme')}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconChangeTheme}></SvgXml>
+            <Text style={styles.textInBtn}>Change Theme</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <View style={styles.frmTopic}>
-                    <SvgXml style={styles.icon} xml={iconGeneral}></SvgXml>
-                    <Text style={styles.textTopic}>General</Text>
-                </View>
+        <View style={styles.frmTopic}>
+          <SvgXml style={styles.icon} xml={iconGeneral}></SvgXml>
+          <Text style={styles.textTopic}>General</Text>
+        </View>
 
-                <TouchableOpacity style={styles.btnStart} onPress={() => navigation.navigate('ChangePhoneNumber')}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconChangePhoneNumber}></SvgXml>
-                        <Text style={styles.textInBtn}>Change Phone Numbers</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnStart} onPress={() => navigation.navigate('ChangePhoneNumber')}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconChangePhoneNumber}></SvgXml>
+            <Text style={styles.textInBtn}>Change Phone Number</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangeEmail')}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconChangeEmail}></SvgXml>
-                        <Text style={styles.textInBtn}>Change Email Address</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangeEmail')}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconChangeEmail}></SvgXml>
+            <Text style={styles.textInBtn}>Change Email Address</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangePassword')}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconChangePassword}></SvgXml>
-                        <Text style={styles.textInBtn}>Change Password</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangePassword')}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconChangePassword}></SvgXml>
+            <Text style={styles.textInBtn}>Change Password</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnMid}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconFeedback}></SvgXml>
-                        <Text style={styles.textInBtn}>Share Feedback</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnMid}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconFeedback}></SvgXml>
+            <Text style={styles.textInBtn}>Share Feedback</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnEnd} onPress={() => navigation.navigate('Report')}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconReport}></SvgXml>
-                        <Text style={styles.textInBtn}>Report Problem</Text>
-                    </View>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnEnd} onPress={() => navigation.navigate('Report')}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconReport}></SvgXml>
+            <Text style={styles.textInBtn}>Report Problem</Text>
+          </View>
+        </TouchableOpacity>
 
-                <View style={styles.frmTopic}>
-                    <SvgXml style={styles.icon} xml={iconCommunity}></SvgXml>
-                    <Text style={styles.textTopic}>Community</Text>
-                </View>
+        <View style={styles.frmTopic}>
+          <SvgXml style={styles.icon} xml={iconCommunity}></SvgXml>
+          <Text style={styles.textTopic}>Community</Text>
+        </View>
 
-                <TouchableOpacity style={styles.btnStart}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconShareAccount}></SvgXml>
-                        <Text style={styles.textInBtn}>Share Your Account</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnStart}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconShareAccount}></SvgXml>
+            <Text style={styles.textInBtn}>Share Your Account</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnMid}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconFriends}></SvgXml>
-                        <Text style={styles.textInBtn}>Friends</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnMid}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconFriends}></SvgXml>
+            <Text style={styles.textInBtn}>Friends</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnMid}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconRate}></SvgXml>
-                        <Text style={styles.textInBtn}>Rate OurZone</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnMid}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconRate}></SvgXml>
+            <Text style={styles.textInBtn}>Rate OurZone</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnMid}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconToS}></SvgXml>
-                        <Text style={styles.textInBtn}>Terms Of Service</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnMid}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconToS}></SvgXml>
+            <Text style={styles.textInBtn}>Terms Of Service</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnEnd}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconPP}></SvgXml>
-                        <Text style={styles.textInBtn}>Privacy Policy</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnEnd}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconPP}></SvgXml>
+            <Text style={styles.textInBtn}>Privacy Policy</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <View style={styles.frmTopic}>
-                    <SvgXml style={styles.icon} xml={iconManager}></SvgXml>
-                    <Text style={styles.textTopic}>Manager</Text>
-                </View>
+        <View style={styles.frmTopic}>
+          <SvgXml style={styles.icon} xml={iconManager}></SvgXml>
+          <Text style={styles.textTopic}>Manager</Text>
+        </View>
 
-                <TouchableOpacity style={styles.btnStart}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconSignOut}></SvgXml>
-                        <Text style={styles.textInBtn}>Sign Out</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
+        <TouchableOpacity style={styles.btnStart}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconSignOut}></SvgXml>
+            <Text style={styles.textInBtn}>Sign Out</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
 
-                <TouchableOpacity style={styles.btnEnd}>
-                    <View style={styles.startSection}>
-                        <SvgXml style={styles.icon} xml={iconDeleteAcc}></SvgXml>
-                        <Text style={styles.textInBtn}>Delete Account</Text>
-                    </View>
-                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-                </TouchableOpacity>
-            </ScrollView>
-
-
-        </Animated.View>
-
-    );
+        <TouchableOpacity style={styles.btnEnd}>
+          <View style={styles.startSection}>
+            <SvgXml style={styles.icon} xml={iconDeleteAcc}></SvgXml>
+            <Text style={styles.textInBtn}>Delete Account</Text>
+          </View>
+          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+        </TouchableOpacity>
+      </ScrollView>
+    </Animated.View>
+  );
 };
 
 const styles = StyleSheet.create({
@@ -369,5 +400,4 @@ const styles = StyleSheet.create({
         padding: 10
     },
 });
-
 export default AccountScreen;

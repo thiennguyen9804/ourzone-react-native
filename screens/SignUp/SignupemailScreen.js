@@ -1,11 +1,11 @@
-import React from 'react';
+import React,  { useState } from 'react';
 import { ImageBackground,Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import backIcon from "../../assets/back-icon";
 import { SvgXml } from "react-native-svg";
 
 
 const SignupemailScreen=({ navigation })=>{
-    const [text, onChangeText] = React.useState('');
+    const [email, setEmail] = React.useState('');
     return(
         <ImageBackground style={{height:'100%',width:'100%',backgroundColor:'#AAC2B3'}} >
         <StatusBar barStyle="dark-content" />
@@ -18,12 +18,12 @@ const SignupemailScreen=({ navigation })=>{
            <View>
            <TextInput
         style={styles.input}
-        onChangeText={onChangeText}
+        onChangeText={setEmail}
          placeholder="Email address..."
-        value={text}
+        value={email}
       />
            </View>
-           <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SignupPass')}>
+           <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SignupPass',  { email }) }>
             <Text style={styles.text}>Continue</Text>
           </TouchableOpacity>
         </SafeAreaView>

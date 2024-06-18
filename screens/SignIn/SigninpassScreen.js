@@ -1,14 +1,28 @@
 import React, { useState } from 'react';
-import { ImageBackground, Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { ImageBackground, Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '../../firebase'; 
 import backIcon from '../../assets/back-icon';
 import hideIcon from '../../assets/eyehide-icon';
 import showIcon from '../../assets/eye-icon';
 
-const SigninpassScreen = ({ navigation }) => {
-  const [text, onChangeText] = useState('');
+const SigninpassScreen = ({ navigation, route }) => {
+  const { email } = route.params;
+  const [password, setPassword] = useState('');
   const [isSecureEntry, setIsSecureEntry] = useState(true);
 
+  const handleLogin = async () => {
+    try {
+      console.log("Logging in with:", email, password);
+      await signInWithEmailAndPassword(auth, email, password);
+      Alert.alert("Success", "Logged in successfully!", [{ text: "OK", onPress: () => navigation.navigate('Camera') }]);
+    } catch (error) {
+      console.error('Error logging in: ', error);
+      Alert.alert("Error", "Failed to log in. Please try again.");
+    }
+  };
+  
   return (
     <ImageBackground style={styles.background}>
       <StatusBar barStyle="dark-content" />
@@ -20,23 +34,22 @@ const SigninpassScreen = ({ navigation }) => {
         <View style={styles.inputContainer}>
           <TextInput
             style={styles.input}
-            onChangeText={onChangeText}
+            onChangeText={setPassword}
             textContentType='password'
             secureTextEntry={isSecureEntry}
             placeholder="Your password..."
-            value={text}
+            value={password}
           />
           <TouchableOpacity style={styles.toggle} onPress={() => setIsSecureEntry(prev => !prev)}>
-            <SvgXml  style={{width: 21,height: 21}} xml={isSecureEntry ? showIcon : hideIcon} />
+            <SvgXml style={{ width: 21, height: 21 }} xml={isSecureEntry ? showIcon : hideIcon} />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.forgot}>
-          <Text style={{color: '#FFFFFF',fontSize: 17, fontFamily: 'OpenSansBold',}}>Forgot password?</Text>
+        <TouchableOpacity style={styles.forgot} onPress={() => navigation.navigate('ForgotPassword')}>
+          <Text style={{ color: '#FFFFFF', fontSize: 17, fontFamily: 'OpenSansBold' }}>Forgot password?</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.btnContinue}  onPress={() => navigation.navigate('Camera')}>
+        <TouchableOpacity style={styles.btnContinue} onPress={handleLogin}>
           <Text style={styles.text}>Continue</Text>
         </TouchableOpacity>
-        
       </SafeAreaView>
     </ImageBackground>
   );
@@ -92,16 +105,12 @@ const styles = StyleSheet.create({
     position: 'absolute',
     right: 32,
     padding: 10,
-
   },
-  forgot:
-  {
+  forgot: {
     justifyContent: 'center',
     alignItems: 'center',
-    // backgroundColor: '#738F81',
     width: 285,
     height: 60,
-    // borderRadius: 35,
     alignSelf: 'center',
   },
   btnContinue: {

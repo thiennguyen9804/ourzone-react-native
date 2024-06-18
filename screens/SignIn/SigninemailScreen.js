@@ -5,7 +5,7 @@ import { SvgXml } from "react-native-svg";
 
 
 const SigninemailScreen=({ navigation })=>{
-    const [text, onChangeText] = React.useState('');
+    const [email, onChangeText] = React.useState('');
     return(
         <ImageBackground style={{height:'100%',width:'100%',backgroundColor:'#AAC2B3'}} >
         <StatusBar barStyle="dark-content" />
@@ -20,10 +20,10 @@ const SigninemailScreen=({ navigation })=>{
         style={styles.input}
         onChangeText={onChangeText}
          placeholder="Email address..."
-        value={text}
+        value={email}
       />
            </View>
-           <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SigninPass')}>
+           <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SigninPass',{ email })}>
             <Text style={styles.text}>Continue</Text>
           </TouchableOpacity>
         </SafeAreaView>

@@ -67,7 +67,7 @@ export default function App() {
           screenOptions={{
             headerShown: false,
           }}
-          initialRouteName='Camera'
+          initialRouteName='Start'
         >
        <Stack.Screen name="Start" component={StartScreen} />
         <Stack.Screen name="SignupEmail" component={SignupEmail} />
