@@ -1,22 +1,20 @@
 
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-import arrowLeftIcon from '../assets/arrow-left-icon';
 
-const UserFriendCard = ({ username, navigation }) => {
+const UserMessageCard = ({ username, navigation, chat }) => {
   return (
     <View style={styles.container}>
-      <View style={styles.avatarContainer}>
-        <View style={styles.avatarOuter}>
-         <Image style={styles.avatar} source={require('../assets/avatar-picture.jpg') }/>
+        <TouchableOpacity style={styles.messButton} onPress={() => navigation.navigate('MessageBox')}>
+            <View style={styles.avatarContainer}>
+                <View style={styles.avatarOuter}>
+                   <Image style={styles.avatar} source={require('../assets/avatar-picture.jpg') }/>
+                    </View>
             </View>
-      </View>
-      <TouchableOpacity style={styles.usernameButton}>
-        <Text style={styles.usernameText}>{username}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.messButton} onPress={() => navigation.navigate('MessageBox')}>
-        <SvgXml  xml={ arrowLeftIcon}></SvgXml>
+            <View style={{ marginLeft: 10, flex: 1 }}>
+                <Text style={styles.usernameText}>{username}</Text>
+                <Text style={styles.chatText}>{chat}</Text>
+            </View>
       </TouchableOpacity>
     </View>
   );
@@ -28,9 +26,9 @@ const styles = StyleSheet.create({
     width: '97%',
     height: 65,
     marginHorizontal: 10,
-    backgroundColor: '#F8FFF8',
     alignItems: 'center',
     borderRadius: 21,
+ 
   },
   avatarContainer: {
     width: 60,
@@ -77,6 +75,8 @@ const styles = StyleSheet.create({
   usernameText: {
     fontSize: 17,
     marginHorizontal: 10,
+    fontWeight: 'bold',
+
     color: '#738F81',
   },
   messButton: {
@@ -97,6 +97,19 @@ const styles = StyleSheet.create({
     color: '#2D2D2D',
     marginLeft: 5,
   },
+  usernameText: {
+    fontSize: 17,
+    fontWeight: 'bold',
+    color: '#738F81',
+  },
+  chatText: {
+    fontSize: 12,
+    color: '#A1A1A1',
+  },
+  chatText: {
+    fontSize: 12,
+    color: '#A1A1A1',
+  },
 });
 
-export default UserFriendCard;
+export default UserMessageCard;

@@ -12,7 +12,6 @@ import ChangeThemeScreen from './screens/changeInfo/ChangeThemeScreen';
 import ReportScreen from './screens/changeInfo/ReportScreen';
 import ChangeNameScreen from './screens/changeInfo/ChangeNameScreen';
 import FriendScreen from './screens/FriendScreen';
-import ConfirmDialog from './components/ConfirmDialog';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import store from './stores/store'
 import { Provider } from 'react-redux';
@@ -25,6 +24,9 @@ import SigninPass from './screens/SignIn/SigninpassScreen';
 import SignupEmail from './screens/SignUp/SignupemailScreen';
 import SignupPass from './screens/SignUp/SignuppassScreen';
 import SignupName from './screens/SignUp/SignupNameScreen';
+import MessageScreen from './screens/Message/MessageScreen';
+import MessageBoxScreen from './screens/Message/MessageBoxScreen';
+
 // import { Asset } from 'expo-asset'
 import { useFonts } from 'expo-font';
 
@@ -85,7 +87,9 @@ export default function App() {
         <Stack.Screen name="Report" component={ReportScreen} />
         <Stack.Screen name="ChangeName" component={ChangeNameScreen} />
         <Stack.Screen name="Friend" component={FriendScreen} />
-        <Stack.Screen name="Confirm" component={ConfirmDialog} />
+        <Stack.Screen name="Message" component={MessageScreen}/>
+        <Stack.Screen name="MessageBox" component={MessageBoxScreen}/>
+
 
         </Stack.Navigator>
       </GestureHandlerRootView>

@@ -18,9 +18,8 @@ import UserRequestCard from '../components/UserRequestCard';
 
 const FriendsScreen = ({ navigation }) => {
   const suggestions = [
-    { id: '1', username: 'Nguyễn Phát Tài' },
-    { id: '2', username: 'Trần Minh Quân' },
-    // Thêm các mục khác vào đây
+    { id: '1', username: 'Nguyễn Văn A' },
+    { id: '2', username: 'Trần Văn B' },
   ];
 
   const renderHeader = () => (
