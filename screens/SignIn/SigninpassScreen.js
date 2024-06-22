@@ -2,27 +2,94 @@ import React, { useState } from 'react';
 import { ImageBackground, Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from '../../firebase'; 
+import { auth,db  } from '../../firebase'; 
 import backIcon from '../../assets/back-icon';
 import hideIcon from '../../assets/eyehide-icon';
 import showIcon from '../../assets/eye-icon';
-
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getAuth ,  sendPasswordResetEmail,  confirmPasswordReset } from "firebase/auth";
+import { doc, getDoc} from 'firebase/firestore';
 const SigninpassScreen = ({ navigation, route }) => {
   const { email } = route.params;
   const [password, setPassword] = useState('');
   const [isSecureEntry, setIsSecureEntry] = useState(true);
+  const [isLogged, setIsLogged] = useState(false);
+  const auth = getAuth(); 
 
-  const handleLogin = async () => {
+  const loginWithEmailHandler = async (email, password) => {
     try {
-      console.log("Logging in with:", email, password);
-      await signInWithEmailAndPassword(auth, email, password);
-      Alert.alert("Success", "Logged in successfully!", [{ text: "OK", onPress: () => navigation.navigate('Camera') }]);
-    } catch (error) {
-      console.error('Error logging in: ', error);
-      Alert.alert("Error", "Failed to log in. Please try again.");
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
+      const userId = user.uid;
+  
+  
+      await AsyncStorage.setItem('userId', userId);
+      const userDocRef = doc(db, 'user', userId); 
+      const userDocSnapshot = await getDoc(userDocRef);
+  
+      if (userDocSnapshot.exists()) {
+  
+        const userDataFromFirestore = userDocSnapshot.data();
+        const firstName = userDataFromFirestore.firstName;
+        const lastName = userDataFromFirestore.lastName;
+        const avatar =userDataFromFirestore.avatar;
+       
+        await AsyncStorage.setItem('userId', userId);
+  
+        
+        const userData = {
+          email: user.email,
+          uid: userId,
+          firstName: firstName,
+          lastName: lastName,
+          avatar: avatar,
+          isLogged: true
+        };
+      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+
+     
+      setIsLogged(true);
+
+      console.log('Logged in successfully:', user.email);
+      navigation.navigate('Camera'); 
+    }
+   } catch (error) {
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      console.error('Error logging in:', errorCode, errorMessage);
+      Alert.alert('Error', 'Email or Password was not corectt. Please try again.');
     }
   };
-  
+
+  const handleLogin = () => {
+    if (!email || !password) {
+      Alert.alert('Error', 'Email or password cannot be empty.');
+      return;
+    }
+
+    loginWithEmailHandler(email, password);
+
+  };
+  // const handleResetPassword = async () => {
+  //   try {
+  //     await confirmPasswordReset(auth, oobCode, password);
+  //     Alert.alert('Password Updated', 'Your password has been updated successfully.');
+  //     navigation.navigate('SignIn'); 
+  //   } catch (error) {
+  //     console.error('Error updating password:', error);
+  //     Alert.alert('Error', 'Failed to update password. Please try again.');
+  //   }
+  // };
+
+  const changePassword = async () => {
+    try {
+      await sendPasswordResetEmail(auth, email);
+      Alert.alert('Password Reset Email Sent', 'Check your email to reset your password.');
+    } catch (error) {
+      console.error('Error sending password reset email:', error);
+      Alert.alert('Error', 'Failed to send password reset email. Please try again.');
+    }
+  };
   return (
     <ImageBackground style={styles.background}>
       <StatusBar barStyle="dark-content" />
@@ -44,7 +111,7 @@ const SigninpassScreen = ({ navigation, route }) => {
             <SvgXml style={{ width: 21, height: 21 }} xml={isSecureEntry ? showIcon : hideIcon} />
           </TouchableOpacity>
         </View>
-        <TouchableOpacity style={styles.forgot} onPress={() => navigation.navigate('ForgotPassword')}>
+        <TouchableOpacity style={styles.forgot} onPress={changePassword}>
           <Text style={{ color: '#FFFFFF', fontSize: 17, fontFamily: 'OpenSansBold' }}>Forgot password?</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.btnContinue} onPress={handleLogin}>

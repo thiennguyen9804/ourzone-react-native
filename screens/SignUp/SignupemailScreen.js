@@ -1,11 +1,25 @@
 import React,  { useState } from 'react';
-import { ImageBackground,Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { ImageBackground,Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Alert} from 'react-native';
 import backIcon from "../../assets/back-icon";
 import { SvgXml } from "react-native-svg";
 
 
 const SignupemailScreen=({ navigation })=>{
     const [email, setEmail] = React.useState('');
+    const checkEmail = async () => {
+        try {
+          if (!email) {
+            Alert.alert('Error', 'Email cannot be empty.');
+            return;
+          }
+         else {
+            navigation.navigate('SignupPass',  { email }) 
+          }
+        } catch (error) {
+          console.error('Error checking email:', error);
+          Alert.alert('Error', 'Failed to check email. Please try again.');
+        }
+      };
     return(
         <ImageBackground style={{height:'100%',width:'100%',backgroundColor:'#AAC2B3'}} >
         <StatusBar barStyle="dark-content" />
@@ -23,7 +37,7 @@ const SignupemailScreen=({ navigation })=>{
         value={email}
       />
            </View>
-           <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SignupPass',  { email }) }>
+           <TouchableOpacity style={styles.btncontinue} onPress={checkEmail}>
             <Text style={styles.text}>Continue</Text>
           </TouchableOpacity>
         </SafeAreaView>

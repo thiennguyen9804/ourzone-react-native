@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ImageBackground, Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import { getAuth, createUserWithEmailAndPassword } from 'firebase/auth';
+import { getAuth, createUserWithEmailAndPassword ,sendEmailVerification} from 'firebase/auth';
 import { getFirestore, doc, setDoc } from 'firebase/firestore';
 import { auth, db } from '../../firebase';
 import backIcon from '../../assets/back-icon';
@@ -11,12 +11,15 @@ const SignupNameScreen = ({ navigation, route }) => {
   const { email, password } = route.params;
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
-
   const handleContinue = async () => {
     try {
       const userCredential = await createUserWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      const avatar =  'https://firebasestorage.googleapis.com/v0/b/locket-clone-d9494.appspot.com/o/Kiana%20Avatar.jpg?alt=media&token=ec7de642-5e91-435f-9bcf-8cee9d1b4096';
+      
+     
+      await sendEmailVerification(auth.currentUser);
+
+      const avatar = 'https://res.cloudinary.com/dh9ougddd/image/upload/uti8d5dnux7m0r5kss0m?_a=CAFAH2AfAAf0';
       const friends = [];
       const phone = null;
       const uid = user.uid;
@@ -38,19 +41,20 @@ const SignupNameScreen = ({ navigation, route }) => {
 
       Alert.alert(
         "Success",
-        "Account created successfully!",
+        "Account created successfully! Please check your email for verification.",
         [
           {
             text: "OK",
-            onPress: () => navigation.navigate('Camera'),
+            onPress: () => navigation.navigate('Start'),
           },
         ]
       );
     } catch (error) {
       console.error('Error creating new user: ', error);
-      Alert.alert("Error", "Failed to create account. Please try again.");
+      Alert.alert("Error", "An account already exists. Please try again with another email.");
     }
   };
+
 
   return (
     <ImageBackground style={styles.background}>
