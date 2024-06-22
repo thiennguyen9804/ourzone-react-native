@@ -60,11 +60,11 @@ export default function App() {
 
   return (
     <Provider store={store}>
-      <ApplicationContext>
+
     <NavigationContainer>
       <StatusBar />
       <GestureHandlerRootView>
-        
+      <ApplicationContext>
         <Stack.Navigator
           screenOptions={{
             headerShown: false,
@@ -92,9 +92,9 @@ export default function App() {
 
 
         </Stack.Navigator>
+        </ApplicationContext>
       </GestureHandlerRootView>
     </NavigationContainer>
-    </ApplicationContext>
     </Provider>
   );
 

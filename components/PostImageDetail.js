@@ -1,5 +1,4 @@
 import { Image, StyleSheet, View, Text, useWindowDimensions, TextInput } from 'react-native';
-
 import { formatDistanceStrict } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useUser } from '../hooks/useUser';
@@ -35,8 +34,8 @@ export default function PostImageDetail({postId}) {
 	}, [setCurrentUser, currentPost]);
 
 	const { height } = useWindowDimensions();
-	// console.log('currentPost', currentPost);
-	// console.log('currentUser', currentUser);
+	console.log('currentPost', currentPost);
+	console.log('currentUser', currentUser);
 	// console.log('createdAt: ', currentPost.createdAt, new Date(currentPost.createdAt.seconds * 1000));
 	return (
 		<View style={[styles.container, { height }]}>

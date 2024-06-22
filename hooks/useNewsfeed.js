@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { collection, query, where, limit, getDocs } from "firebase/firestore";
+import { collection, query, where, limit, getDocs, updateDoc, doc, arrayUnion } from "firebase/firestore";
 import { app, db } from "../firebase";
 import { useDispatch } from "react-redux";
 import { setUserId } from "../slices/userSlice";
@@ -19,5 +19,14 @@ export const useNewsfeed = () => {
 		return Promise.resolve(res);
 	}
 
-	return { getNewsfeedByUserId };
+	const addNewPostIdToNewsfeed = async (newsfeedId, postId) => {
+		const newsfeedRef = await doc(db, 'newsfeed', newsfeedId);
+		const newsfeedRes = await updateDoc(newsfeedRef, {
+			posts: arrayUnion(postId)
+		});
+
+		return Promise.resolve(newsfeedRes);
+	}
+
+	return { getNewsfeedByUserId, addNewPostIdToNewsfeed };
 }

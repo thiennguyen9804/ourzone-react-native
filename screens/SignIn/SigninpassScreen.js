@@ -1,57 +1,66 @@
 import React, { useState } from 'react';
-import { ImageBackground, Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Keyboard, ImageBackground, Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Alert } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../../firebase'; 
 import backIcon from '../../assets/back-icon';
 import hideIcon from '../../assets/eyehide-icon';
 import showIcon from '../../assets/eye-icon';
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { useApplicationContext } from '../../hooks/useApplicationContext';
 
 const SigninpassScreen = ({ navigation, route }) => {
-  const { email } = route.params;
-  const [password, setPassword] = useState('');
+  const { email, password, setPassword, setUser, user } = useApplicationContext();
   const [isSecureEntry, setIsSecureEntry] = useState(true);
 
   const handleLogin = async () => {
     try {
-      console.log("Logging in with:", email, password);
-      await signInWithEmailAndPassword(auth, email, password);
+      // console.log("Logging in with:", email, password);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const currentUser =  userCredential.user;
+      setUser(prev => ({...prev, userId: currentUser.uid}));
       Alert.alert("Success", "Logged in successfully!", [{ text: "OK", onPress: () => navigation.navigate('Camera') }]);
     } catch (error) {
       console.error('Error logging in: ', error);
       Alert.alert("Error", "Failed to log in. Please try again.");
     }
   };
+
+  console.log('user', user);
+  // console.log('userId', userId);
+
   
   return (
-    <ImageBackground style={styles.background}>
-      <StatusBar barStyle="dark-content" />
-      <SafeAreaView>
-        <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('SigninEmail')}>
-          <SvgXml style={styles.backIcon} xml={backIcon} />
-        </TouchableOpacity>
-        <Text style={styles.txt}>Enter your password: </Text>
-        <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            onChangeText={setPassword}
-            textContentType='password'
-            secureTextEntry={isSecureEntry}
-            placeholder="Your password..."
-            value={password}
-          />
-          <TouchableOpacity style={styles.toggle} onPress={() => setIsSecureEntry(prev => !prev)}>
-            <SvgXml style={{ width: 21, height: 21 }} xml={isSecureEntry ? showIcon : hideIcon} />
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+      <ImageBackground style={styles.background}>
+        <StatusBar barStyle="dark-content" />
+        <SafeAreaView>
+          <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('SigninEmail')}>
+            <SvgXml style={styles.backIcon} xml={backIcon} />
           </TouchableOpacity>
-        </View>
-        <TouchableOpacity style={styles.forgot} onPress={() => navigation.navigate('ForgotPassword')}>
-          <Text style={{ color: '#FFFFFF', fontSize: 17, fontFamily: 'OpenSansBold' }}>Forgot password?</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.btnContinue} onPress={handleLogin}>
-          <Text style={styles.text}>Continue</Text>
-        </TouchableOpacity>
-      </SafeAreaView>
-    </ImageBackground>
+          <Text style={styles.txt}>Enter your password: </Text>
+          <View style={styles.inputContainer}>
+            <TextInput
+              style={styles.input}
+              onChangeText={setPassword}
+              textContentType='password'
+              secureTextEntry={isSecureEntry}
+              placeholder="Your password..."
+              value={password}
+            />
+            <TouchableOpacity style={styles.toggle} onPress={() => setIsSecureEntry(prev => !prev)}>
+              <SvgXml style={{ width: 21, height: 21 }} xml={isSecureEntry ? showIcon : hideIcon} />
+            </TouchableOpacity>
+          </View>
+          <TouchableOpacity style={styles.forgot} onPress={() => navigation.navigate('ForgotPassword')}>
+            <Text style={{ color: '#FFFFFF', fontSize: 17, fontFamily: 'OpenSansBold' }}>Forgot password?</Text>
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.btnContinue} onPress={handleLogin}>
+            <Text style={styles.text}>Continue</Text>
+          </TouchableOpacity>
+        </SafeAreaView>
+      </ImageBackground>
+    </TouchableWithoutFeedback>
   );
 };
 

@@ -1,7 +1,8 @@
 import { useState } from "react"
-import { collection, query, where, limit, getDocs } from "firebase/firestore";
+import { collection, query, where, limit, getDocs, Timestamp, setDoc, addDoc, updateDoc } from "firebase/firestore";
 import { app, db } from "../firebase";
 import { useDispatch } from "react-redux";
+import { useApplicationContext } from "./useApplicationContext";
 
 
 export const usePost = () => {
@@ -21,5 +22,19 @@ export const usePost = () => {
 		return Promise.resolve(res);
 	}	
 
-	return { getPostByPostId };
+	const createPost = async (content, image, userId) => {
+		const newPost = {
+			content,
+			createdAt: Timestamp.fromMillis(Date.now()),
+			image,
+			userId
+		};
+
+		const newPostRef = await addDoc(collection(db, 'post'), newPost);
+		const result = await updateDoc(newPostRef, { postId: newPostRef.id });
+		console.log('result from add post', result);
+		return Promise.resolve(newPostRef);
+	};
+
+	return { getPostByPostId, createPost };
 }

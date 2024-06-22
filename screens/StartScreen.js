@@ -1,11 +1,22 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Text, View, StyleSheet, ImageBackground, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import leaficon from '../assets/leaf-icon';
+import { useApplicationContext } from '../hooks/useApplicationContext';
 const sourcebr = require('../assets/image.png');
+import { auth } from '../firebase'
+import { useNavigation } from '@react-navigation/native';
 
 const StartScreen = ({ navigation }) => {
-  console.log(leaficon); 
+  // console.log(leaficon); 
+  const { setUser } = useApplicationContext();
+  // const navigation = useNavigation();
+  useEffect(() => {
+	  if(auth.currentUser && auth.currentUser.uid) {
+			setUser(prev => ({...prev, userId: auth.currentUser.uid}));		
+			navigation.navigate('Camera');
+		}
+	}, []); 
 
   if (!leaficon) {
     console.error('SVG XML is undefined'); 
