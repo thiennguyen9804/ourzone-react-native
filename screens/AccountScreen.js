@@ -5,6 +5,7 @@ import { SvgXml } from 'react-native-svg';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase'; 
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 // Icons
 import iconBack from "../assets/back-icon";
@@ -30,34 +31,71 @@ import iconDeleteAcc from "../assets/delete-acc-icon";
 
 const AccountScreen = ({ navigation }) => {
   const [userData, setUserData] = useState(null);
+  const auth = getAuth(); 
 
   useEffect(() => {
-    const fetchUserData = async (user) => {
+    const fetchUserData = async (uid) => {
       try {
-        const userDoc = await getDoc(doc(db, 'user', user.uid));
-        if (userDoc.exists()) {
-          setUserData(userDoc.data());
+        const userDataJSON = await AsyncStorage.getItem('userData');
+        if (userDataJSON) {
+          const userData = JSON.parse(userDataJSON); 
+          const userDoc = await getDoc(doc(db, 'user', userData.uid)); 
+          console.log("User data from database:", userData);
+          setUserData(userData);
         } else {
-          Alert.alert("Error", "No user data found");
+          Alert.alert("Error", "No user data found in AsyncStorage");
         }
       } catch (error) {
         console.error("Error fetching user data: ", error);
         Alert.alert("Error", "Failed to fetch user data. Please try again.");
       }
-    };
-
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    }
+    const unsubscribe = onAuthStateChanged(auth, async (user) => {
       if (user) {
-        fetchUserData(user);
+        try {
+          const userDataFromStorage = await AsyncStorage.getItem('userData');
+          if (userDataFromStorage) {
+            const parsedUserData = JSON.parse(userDataFromStorage);
+            fetchUserData(parsedUserData.userData);
+          } else {
+            // Alert.alert("Error", "No user data found in AsyncStorage");
+          }
+        } catch (error) {
+          console.error("Error fetching user data from AsyncStorage: ", error);
+          Alert.alert("Error", "Failed to fetch user data from AsyncStorage. Please try again.");
+        }
       } else {
-        Alert.alert("Error", "Failed to fetch user data. Please try again.");
-        navigation.navigate('Start'); 
+        setUserData(null); 
       }
     });
 
-    return () => unsubscribe();
-  }, [navigation]);
+    const checkInitialUser = async () => {
+      try {
+        const userDataFromStorage = await AsyncStorage.getItem('userData');
+        if (userDataFromStorage) {
+          const parsedUserData = JSON.parse(userDataFromStorage);
+          fetchUserData(parsedUserData.uid);
+        }
+      } catch (error) {
+        console.error("Error checking initial user data: ", error);
+      }
+    };
 
+    checkInitialUser(); 
+
+    return () => unsubscribe();
+  }, []); 
+  const signOut = async () => {
+    try {
+      await AsyncStorage.removeItem('userData');
+      await auth.signOut(); 
+      Alert.alert('Success', 'Already sign out.');
+      navigation.navigate('Start');
+    } catch (error) {
+      console.error('Error signing out:', error);
+      Alert.alert('Sign Out Failed', 'Failed to sign out. Please try again.');
+    }
+  };
   if (!userData) {
     return null; 
   }
@@ -200,7 +238,7 @@ const AccountScreen = ({ navigation }) => {
           <Text style={styles.textTopic}>Manager</Text>
         </View>
 
-        <TouchableOpacity style={styles.btnStart}>
+        <TouchableOpacity style={styles.btnStart} onPress={signOut} >
           <View style={styles.startSection}>
             <SvgXml style={styles.icon} xml={iconSignOut}></SvgXml>
             <Text style={styles.textInBtn}>Sign Out</Text>

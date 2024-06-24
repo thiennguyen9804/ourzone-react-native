@@ -43,9 +43,9 @@ export default function PostImageDetail({postId}) {
 			<View style={styles.imageContainer}>
 				<View style={styles.innerImageContainer}>
 					<Image style={styles.image} resizeMode='cover' source={{uri: currentPost.image}}/>
-					<View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
+					{currentPost.content && <View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
 						<TextInput multiline textAlign='center' style={styles.messageInput} editable={false} value={currentPost.content}/>
-					</View>
+					</View>}
 				</View>
 				
 			</View>

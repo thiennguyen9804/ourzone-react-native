@@ -17,6 +17,8 @@ const SigninemailScreen=({ navigation })=>{
                     </TouchableOpacity>
                     <Text style={styles.txt}>Enter your email: </Text>
                 <View>
+
+                {/* email text input */}
                 <TextInput
                     style={styles.input}
                     autoCapitalize='none'

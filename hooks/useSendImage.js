@@ -14,10 +14,10 @@ export const useSendImage = () => {
 		throw new Error('user is not exists')
 	}
 
-	if(!user.userId) {
-		console.log(user);
-		throw new Error('userId is not exists');
-	}
+	// if(!user.userId) {
+	// 	console.log(user);
+	// 	throw new Error('userId is not exists');
+	// }
 	const sendImage = async (imageUri, content) => {
 		const fetchResponse = await fetch(imageUri);
 		const theBlob = await fetchResponse.blob();

@@ -1,6 +1,7 @@
 import React, { useEffect } from 'react';
 import { Text, View, StyleSheet, ImageBackground, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import leaficon from '../assets/leaf-icon';
 import { useApplicationContext } from '../hooks/useApplicationContext';
 const sourcebr = require('../assets/image.png');
@@ -8,19 +9,16 @@ import { auth } from '../firebase'
 import { useNavigation } from '@react-navigation/native';
 
 const StartScreen = ({ navigation }) => {
-  // console.log(leaficon); 
-  const { setUser } = useApplicationContext();
-  // const navigation = useNavigation();
-  useEffect(() => {
-	  if(auth.currentUser && auth.currentUser.uid) {
-			setUser(prev => ({...prev, userId: auth.currentUser.uid}));		
-			navigation.navigate('Camera');
-		}
-	}, []); 
+  // useEffect(() => {
+  //   const checkLoginStatus = async () => {
+  //     const isLoggedIn = await AsyncStorage.getItem('isLoggedIn');
+  //     if (isLoggedIn === 'true') {
+  //       navigation.replace('Camera');
+  //     }
+  //   };
 
-  if (!leaficon) {
-    console.error('SVG XML is undefined'); 
-  }
+  //   checkLoginStatus();
+  // }, []);
 
   return ( 
     <ImageBackground style={{height:'100%',width:'100%',	position: 'absolute'}} source={sourcebr}>
@@ -81,9 +79,8 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily:'OpenSansBold',
   },
-  btnsignin:
-  {
-
+  btnsignin: {
+    // Add any necessary styles for the Sign In button
   }
 });
 
