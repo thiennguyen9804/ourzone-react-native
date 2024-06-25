@@ -1,14 +1,67 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Touchable } from 'react-native';
 import Animated, { SlideInDown, SlideInUp, SlideOutDown, SlideOutUp } from "react-native-reanimated";
 import { SvgXml } from 'react-native-svg';
 import { TextInput } from 'react-native-gesture-handler';
+import { db, auth } from '../../firebase';
+import { getDoc, doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
 //icon
 import iconBack from "../../assets/back-icon";
 
-const ChangeEmailScreen = ({ navigation }) => {
+const ChangeNameScreen = ({ navigation }) => {
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
+    const [userId, setUserId] = useState(null);
+
+    const auth = getAuth();
+
+    useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserId(user.uid);
+                const userDocRef = doc(db, 'user', user.uid);
+                const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
+                    if (doc.exists()) {
+                        const userData = doc.data();
+                        setFirstName(userData.firstName || '');
+                        setLastName(userData.lastName || '');
+                    } else {
+                        console.log('No such document!');
+                    }
+                });
+
+                return () => {
+                    unsubscribeSnapshot();
+                };
+            }
+        });
+
+        return () => {
+            unsubscribeAuth();
+        };
+    }, []);
+
+
+    const handleSave = async () => {
+        if (userId) {
+            try {
+                const userDocRef = doc(db, 'user', userId);
+                await updateDoc(userDocRef, {
+                    firstName: firstName,
+                    lastName: lastName
+                });
+                console.log("Document written with ID: ", userId);
+                navigation.reset({
+                    index: 10,
+                    routes: [{ name: 'Account' }],
+                });
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        }
+    };
+
 
     return (
         <Animated.View
@@ -22,23 +75,22 @@ const ChangeEmailScreen = ({ navigation }) => {
 
             <View style={styles.frmTopic}>
                 <Text style={styles.textTopic}
-
                 >Enter Your Name</Text>
             </View>
 
             <TextInput style={styles.frmEdit}
                 placeholder="First Name"
                 value={firstName}
-                onChange={setFirstName} ></TextInput>
+                onChangeText={setFirstName} ></TextInput>
 
             <TextInput style={styles.frmEdit}
                 placeholder="Last Name"
                 value={lastName}
-                onChange={setLastName} ></TextInput>
+                onChangeText={setLastName} ></TextInput>
 
 
 
-            <TouchableOpacity style={styles.btnSave}>
+            <TouchableOpacity style={styles.btnSave} onPress={handleSave}>
                 <Text style={styles.textInBtn}>Save</Text>
             </TouchableOpacity>
 
@@ -121,4 +173,4 @@ const styles = StyleSheet.create({
 
 });
 
-export default ChangeEmailScreen;
+export default ChangeNameScreen;

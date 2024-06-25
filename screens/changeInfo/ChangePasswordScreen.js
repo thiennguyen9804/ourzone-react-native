@@ -1,22 +1,59 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Touchable } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Image, Touchable, Alert } from 'react-native';
 import Animated, { SlideInDown, SlideInUp, SlideOutDown, SlideOutUp } from "react-native-reanimated";
 import { SvgXml } from 'react-native-svg';
 import { TextInput } from 'react-native-gesture-handler';
+import { db, auth } from '../../firebase';
+import { updatePassword, EmailAuthCredential, reauthenticateWithCredential, EmailAuthProvider } from 'firebase/auth';
+import { doc, getDoc, setDoc } from 'firebase/firestore';
 
+//icon
 import iconBack from '../../assets/back-icon';
-import iconEyeOpen from '../../assets/eye-open-icon';
-import iconEyeClose from '../../assets/eye-close-icon';
+import hideIcon from '../../assets/eyehide-icon';
+import showIcon from '../../assets/eye-icon';
 
 const ChangePasswordScreen = ({ navigation }) => {
     const [currentPassword, setCurrentPassword] = useState('');
     const [newPassword, setNewPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
-    const [secureTextEntry, setSecureTextEntry] = useState(true);
+    const [isSecureEntry1, setIsSecureEntry1] = useState(true);
+    const [isSecureEntry2, setIsSecureEntry2] = useState(true);
+    const [isSecureEntry3, setIsSecureEntry3] = useState(true);
 
-    const toggleSecureTextEntry = () => {
-        setSecureTextEntry(!secureTextEntry);
-    };
+    const handleChangePassword = async () => {
+        try {
+            const user = auth.currentUser;
+
+            const credential = EmailAuthProvider.credential(user.email, currentPassword);
+            await reauthenticateWithCredential(user, credential);
+
+            if (newPassword !== confirmPassword) {
+                Alert.alert('Password do not match');
+                return;
+            }
+
+            await updatePassword(user, newPassword);
+            console.log('Password updated successfully');
+
+            const userDocRef = doc(db, 'user', user.uid);
+            const docSnap = await getDoc(userDocRef);
+
+            if (docSnap.exists()) {
+                await updateDoc(userDocRef, {
+                    password: newPassword
+                });
+                console.log("Document written with ID: ");
+            } else {
+                await setDoc(userDocRef, { password: newPassword });
+                console.log("Create document with ID: ");
+            }
+
+            navigation.navigate('Account');
+        } catch (e) {
+            console.log('Error updating password: ', e);
+            Alert.alert('Failed to update password. Please try again later.');
+        }
+    }
 
     return (
         <Animated.View
@@ -31,34 +68,45 @@ const ChangePasswordScreen = ({ navigation }) => {
             <View style={styles.frmTopic}>
                 <Text style={styles.textTopic}>Enter Your Password</Text>
             </View>
-            {/* 
+
             <View style={styles.frmEdit}>
                 <TextInput style={styles.textInEdit}
                     placeholder='Enter current password'
-                    value={text}
                     onChangeText={setCurrentPassword}
-                    secureTextEntry={secureTextEntry}
-                ></TextInput>
-                <TouchableOpacity style={styles.icon}
-                    onPress={toggleSecureTextEntry}>
+                    textContentType='password'
+                    secureTextEntry={isSecureEntry1}
+                    value={currentPassword}></TextInput>
+                <TouchableOpacity style={styles.iconEye} onPress={() => setIsSecureEntry1(prev => !prev)}>
+                    <SvgXml style={{ width: 21, height: 21, marginVertical: "auto" }} xml={isSecureEntry1 ? hideIcon : showIcon} />
                 </TouchableOpacity>
-            </View> */}
+            </View>
 
-            <TextInput style={styles.frmEdit}
-                placeholder='Enter current password'
-                onChange={setCurrentPassword}
-                value={currentPassword}></TextInput>
-            <TextInput style={styles.frmEdit}
-                placeholder='Enter new password'
-                onChange={setNewPassword}
-                value={newPassword}></TextInput>
-            <TextInput style={styles.frmEdit}
-                placeholder='Confirm new password'
-                onChange={setConfirmPassword}
-                value={confirmPassword}></TextInput>
+            <View style={styles.frmEdit}>
+                <TextInput style={styles.textInEdit}
+                    placeholder='Enter new password'
+                    onChangeText={setNewPassword}
+                    textContentType='password'
+                    secureTextEntry={isSecureEntry2}
+                    value={newPassword}></TextInput>
+                <TouchableOpacity style={styles.iconEye} onPress={() => setIsSecureEntry2(prev => !prev)}>
+                    <SvgXml style={{ width: 21, height: 21, marginVertical: "auto" }} xml={isSecureEntry2 ? hideIcon : showIcon} />
+                </TouchableOpacity>
+            </View>
+
+            <View style={styles.frmEdit}>
+                <TextInput style={styles.textInEdit}
+                    placeholder='Confirm new password'
+                    onChangeText={setConfirmPassword}
+                    textContentType='password'
+                    secureTextEntry={isSecureEntry3}
+                    value={confirmPassword}></TextInput>
+                <TouchableOpacity style={styles.iconEye} onPress={() => setIsSecureEntry3(prev => !prev)}>
+                    <SvgXml style={{ width: 21, height: 21, marginVertical: "auto" }} xml={isSecureEntry3 ? hideIcon : showIcon} />
+                </TouchableOpacity>
+            </View>
 
 
-            <TouchableOpacity style={styles.btnSave}>
+            <TouchableOpacity style={styles.btnSave} onPress={handleChangePassword}>
                 <Text style={styles.textInBtn}>Save</Text>
             </TouchableOpacity>
         </Animated.View>
@@ -124,15 +172,16 @@ const styles = StyleSheet.create({
         fontWeight: "400",
         color: "#626262",
         letterSpacing: 2.7,
+        paddingEnd: 10
     },
 
-    // textInEdit: {
-    //     width: "90%",
-    //     fontSize: 12,
-    //     fontWeight: "400",
-    //     color: "#626262",
-    //     letterSpacing: 2.7,
-    // },
+    textInEdit: {
+        width: "90%",
+        fontSize: 12,
+        fontWeight: "400",
+        color: "#626262",
+        letterSpacing: 2.7,
+    },
 
     btnSave: {
         width: 118,

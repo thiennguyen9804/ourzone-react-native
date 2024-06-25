@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Alert, ScrollView, ToastAndroid } from 'react-native';
-import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
+import { StyleSheet, View, Linking, Share, Text, TouchableOpacity, Image, Alert, ScrollView, ToastAndroid } from 'react-native';
+import Animated, { SlideInDown, SlideOutDown, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase'; 
+import { auth, db } from '../firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApplicationContext } from '../hooks/useApplicationContext';
+import { useIsFocused } from '@react-navigation/native';
 
 // Icons
 import iconBack from "../assets/back-icon";
@@ -33,240 +34,339 @@ import iconDeleteAcc from "../assets/delete-acc-icon";
 
 
 const AccountScreen = ({ navigation }) => {
-  const { user } = useApplicationContext();
+    const { user } = useApplicationContext();
+    const [userData, setUserData] = useState(null);
+    const [selectedImage, setSelectedImage] = useState(null);
+    const [uploading, setUploading] = useState(false);
+    const isFocused = useIsFocused();
 
-  useEffect(() => {
-    // const fetchUserData = async (uid) => {
-    //   try {
-    //     const userDataJSON = await AsyncStorage.getItem('userData');
-    //     if (userDataJSON) {
-    //       const userData = JSON.parse(userDataJSON); 
-    //       const userDoc = await getDoc(doc(db, 'user', userData.uid)); 
-    //       console.log("User data from database:", userData);
-    //       setUserData(userData);
-    //     } else {
-    //       Alert.alert("Error", "No user data found in AsyncStorage");
-    //     }
-    //   } catch (error) {
-    //     console.error("Error fetching user data: ", error);
-    //     Alert.alert("Error", "Failed to fetch user data. Please try again.");
-    //   }
-    // }
-    // const unsubscribe = onAuthStateChanged(auth, async (user) => {
-    //   if (user) {
-    //     try {
-    //       const userDataFromStorage = await AsyncStorage.getItem('userData');
-    //       if (userDataFromStorage) {
-    //         const parsedUserData = JSON.parse(userDataFromStorage);
-    //         fetchUserData(parsedUserData.userData);
-    //       } else {
-    //         // Alert.alert("Error", "No user data found in AsyncStorage");
-    //       }
-    //     } catch (error) {
-    //       console.error("Error fetching user data from AsyncStorage: ", error);
-    //       Alert.alert("Error", "Failed to fetch user data from AsyncStorage. Please try again.");
-    //     }
-    //   } else {
-    //     setUserData(null); 
-    //   }
-    // });
+    useEffect(() => {
+        const fetchUserData = async (uid) => {
+            try {
+                const userDataJSON = await AsyncStorage.getItem('userData');
+                if (userDataJSON) {
+                    const userData = JSON.parse(userDataJSON);
+                    const userDoc = await getDoc(doc(db, 'user', userData.uid));
+                    console.log("User data from database:", userData);
+                    setUserData(userData);
+                } else {
+                    Alert.alert("Error", "No user data found in AsyncStorage");
+                }
+            } catch (error) {
+                console.error("Error fetching user data: ", error);
+                Alert.alert("Error", "Failed to fetch user data. Please try again.");
+            }
+        }
+        const unsubscribe = onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                try {
+                    const userDataFromStorage = await AsyncStorage.getItem('userData');
+                    if (userDataFromStorage) {
+                        const parsedUserData = JSON.parse(userDataFromStorage);
+                        fetchUserData(parsedUserData.userData);
+                    } else {
+                        // Alert.alert("Error", "No user data found in AsyncStorage");
+                    }
+                } catch (error) {
+                    console.error("Error fetching user data from AsyncStorage: ", error);
+                    Alert.alert("Error", "Failed to fetch user data from AsyncStorage. Please try again.");
+                }
+            } else {
+                setUserData(null);
+            }
+        });
+    });
 
-    // const checkInitialUser = async () => {
-    //   try {
-    //     const userDataFromStorage = await AsyncStorage.getItem('userData');
-    //     if (userDataFromStorage) {
-    //       const parsedUserData = JSON.parse(userDataFromStorage);
-    //       fetchUserData(parsedUserData.uid);
-    //     }
-    //   } catch (error) {
-    //     console.error("Error checking initial user data: ", error);
-    //   }
-    // };
-
-    // checkInitialUser(); 
-
-    // return () => unsubscribe();
-  }, []); 
-
+    const fetchUserData = async (user) => {
+        try {
+            const userDoc = await getDoc(doc(db, 'user', user.uid));
+            if (userDoc.exists()) {
+                setUserData(userDoc.data());
+                setSelectedImage({ uri: userDoc.data().avatar });
+            } else {
+                Alert.alert("Error", "No user data found");
+            }
+        } catch (error) {
+            console.error("Error fetching user data: ", error);
+            Alert.alert("Error", "Failed to fetch user data. Please try again.");
+        }
+    };
 
 
+    useEffect(() => {
+        const unsubscribe = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                fetchUserData(user);
+            } else {
+                navigation.navigate('Start');
+            }
+        });
 
-  const signOut = async () => {
-  //   try {
-  //     await AsyncStorage.removeItem('userData');
-  //     await auth.signOut(); 
-  //     Alert.alert('Success', 'Already sign out.');
-  //     navigation.navigate('Start');
-  //   } catch (error) {
-  //     console.error('Error signing out:', error);
-  //     Alert.alert('Sign Out Failed', 'Failed to sign out. Please try again.');
-  //   }
-  // };
-  // if (!userData) {
-  //   console.log('no user data, no account screen')
-  //   return null; 
-    AsyncStorage.removeItem('userId');
-    auth.signOut();
-    navigation.navigate('Start');
-    ToastAndroid.show('Logout successfully!', ToastAndroid.SHORT);
-  }
+        return () => unsubscribe();
+    }, [navigation]);
 
-  return (
-    <Animated.View
-      style={styles.container}
-      entering={SlideInDown}
-      exiting={SlideOutDown}
-    >
-      <View>
-        <TouchableOpacity style={styles.btnBack} onPress={() => navigation.navigate('Camera')}>
-          <SvgXml style={styles.iconBack} xml={iconBack}></SvgXml>
-        </TouchableOpacity>
-      </View>
 
-      <ScrollView style={styles.containerScrollView} >
-        <View style={styles.bgAvatar} >
-          <Image style={styles.imgAvatar} source={{ uri: user.avatar }} />
-        </View>
-        <TouchableOpacity style={styles.btnChangeAvatar}>
-          <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
-        </TouchableOpacity>
 
-        <View style={styles.frmName}>
-          <Text style={styles.textName}>{user.firstName} {user.lastName}</Text>
-        </View>
+    useEffect(() => {
+        if (isFocused) {
+            const user = auth.currentUser;
+            if (user) {
+                fetchUserData(user);
+            }
+        }
+    }, [isFocused]);
 
-        <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>
-          <Text style={{
+    if (!userData) {
+        return null;
+    }
+
+    const { firstName, lastName } = userData;
+    const fullName = `${firstName} ${lastName}`;
+
+    const handleSignOut = async () => {
+        try {
+            await auth.signOut();
+            console.log('User signed out successfully');
+            navigation.navigate('Start')
+        } catch (e) {
+            console.error('Error signing out:', e);
+            Alert.alert('Failed to sign out. Please try again.');
+        }
+    }
+
+    const handleToS = () => {
+        const url = 'https://www.termsfeed.com/live/3850fb92-b96e-4c91-91ef-bddc59c16062';
+        Linking.openURL(url).catch(err => console.error("Couldn't load page", err));
+    };
+
+    const handlePP = () => {
+        const url = 'https://www.freeprivacypolicy.com/live/333cd034-884b-4b6f-8150-84097a542a5a';
+        Linking.openURL(url).catch(err => console.error("Couldn't load page"));
+    };
+
+    const handleShare = async () => {
+        const userId = auth.currentUser.uid;
+        const url = `https://ourzone.com/profile/${userId}`;
+
+        try {
+            const result = await Share.share({
+                message: url,
+            });
+
+            if (result.action === Share.sharedAction) {
+                if (result.activityType) {
+                    console.log('shared with activity type of: ', result.activityType)
+                } else {
+                    console.log('shared')
+                }
+            } else if (result.action === Share.dismissedAction) {
+                console.log('dismissed')
+            }
+
+        } catch (e) {
+            console.error(e.message);
+        }
+    }
+
+    const handleFeedback = () => {
+        const userId = auth.currentUser.uid;
+        const timestamp = new Date().toLocaleString();
+
+        const email = 'mailto:ourzone.company@gmail.com';
+        const subject = 'subject=Feedback';
+        const body = `body=User ID: ${userId}%0D%0ATime: ${timestamp}%0D%0A%0D%0AHi, I would like to share the following feedback:%0D%0A`;
+
+        Linking.openURL(`${email}?${subject}&${body}`)
+            .catch(err => console.error("Couldn't send mail. Please try again later.", err));
+    };
+
+    const handleDeleteAccount = async () => {
+        try {
+            await deleteUser(auth.currentUser);
+
+            const userDocRef = db.collection('user').doc(auth.currentUser.uid);
+            await userDocRef.delete();
+
+            await auth.signOut();
+            navigation.navigate('Start');
+        } catch (e) {
+            console.error('Error deleting user: ', e);
+            Alert.alert('Failed to delete account. Please try again.');
+        }
+    }
+
+    const confirmDeleteAccount = () => {
+        Alert.alert(
+            'Confirm Delete',
+            'Are you sure you want to delete this account?',
+            [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Delete', onPress: handleDeleteAccount, style: 'delete' }
+            ],
+            { cancelabel: false }
+        );
+    };
+
+    return (
+        <Animated.View
+            style={styles.container}
+            entering={SlideInRight}
+            exiting={SlideOutLeft}
+        >
+            <View>
+                <TouchableOpacity style={styles.btnBack} onPress={() => navigation.navigate('Camera')}>
+                    <SvgXml style={styles.iconBack} xml={iconBack}></SvgXml>
+                </TouchableOpacity>
+            </View>
+
+            <ScrollView style={styles.containerScrollView} >
+                <View style={styles.bgAvatar}>
+                    <Image style={styles.imgAvatar} source={selectedImage} />
+                </View>
+                <TouchableOpacity style={styles.btnChangeAvatar}>
+                    <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
+                </TouchableOpacity>
+
+                <View style={styles.frmName}>
+                    <Text style={styles.textName}>{fullName}</Text>
+                </View>
+
+                <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>
+                    <Text style={{
                         fontSize: 20, fontWeight: "700", letterSpacing: 0.7, color: "white",
                         alignContent: "center", marginHorizontal: "auto", marginVertical: "auto"
-          }}>Edit Info</Text>
-        </TouchableOpacity>
+                    }}>Edit Info</Text>
+                </TouchableOpacity>
 
-        <View style={styles.frmTopic}>
-          <SvgXml style={styles.icon} xml={iconTheme}></SvgXml>
-          <Text style={styles.textTopic}>Theme</Text>
-        </View>
+                <View style={styles.frmTopic}>
+                    <SvgXml style={styles.icon} xml={iconTheme}></SvgXml>
+                    <Text style={styles.textTopic}>Theme</Text>
+                </View>
 
-        <TouchableOpacity style={styles.btnNormal} onPress={() => navigation.navigate('ChangeTheme')}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconChangeTheme}></SvgXml>
-            <Text style={styles.textInBtn}>Change Theme</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnNormal} onPress={() => navigation.navigate('ChangeTheme')}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconChangeTheme}></SvgXml>
+                        <Text style={styles.textInBtn}>Change Theme</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <View style={styles.frmTopic}>
-          <SvgXml style={styles.icon} xml={iconGeneral}></SvgXml>
-          <Text style={styles.textTopic}>General</Text>
-        </View>
+                <View style={styles.frmTopic}>
+                    <SvgXml style={styles.icon} xml={iconGeneral}></SvgXml>
+                    <Text style={styles.textTopic}>General</Text>
+                </View>
 
-        <TouchableOpacity style={styles.btnStart} onPress={() => navigation.navigate('ChangePhoneNumber')}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconChangePhoneNumber}></SvgXml>
-            <Text style={styles.textInBtn}>Change Phone Number</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnStart} onPress={() => navigation.navigate('ChangePhoneNumber')}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconChangePhoneNumber}></SvgXml>
+                        <Text style={styles.textInBtn}>Change Phone Number</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangeEmail')}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconChangeEmail}></SvgXml>
-            <Text style={styles.textInBtn}>Change Email Address</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangeEmail')}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconChangeEmail}></SvgXml>
+                        <Text style={styles.textInBtn}>Change Email Address</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangePassword')}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconChangePassword}></SvgXml>
-            <Text style={styles.textInBtn}>Change Password</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('ChangePassword')}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconChangePassword}></SvgXml>
+                        <Text style={styles.textInBtn}>Change Password</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnMid}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconFeedback}></SvgXml>
-            <Text style={styles.textInBtn}>Share Feedback</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnMid} onPress={handleFeedback}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconFeedback}></SvgXml>
+                        <Text style={styles.textInBtn}>Share Feedback</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnEnd} onPress={() => navigation.navigate('Report')}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconReport}></SvgXml>
-            <Text style={styles.textInBtn}>Report Problem</Text>
-          </View>
-        </TouchableOpacity>
 
-        <View style={styles.frmTopic}>
-          <SvgXml style={styles.icon} xml={iconCommunity}></SvgXml>
-          <Text style={styles.textTopic}>Community</Text>
-        </View>
+                <TouchableOpacity style={styles.btnEnd} onPress={() => navigation.navigate('Report')}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconReport}></SvgXml>
+                        <Text style={styles.textInBtn}>Report Problem</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnStart}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconShareAccount}></SvgXml>
-            <Text style={styles.textInBtn}>Share Your Account</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <View style={styles.frmTopic}>
+                    <SvgXml style={styles.icon} xml={iconCommunity}></SvgXml>
+                    <Text style={styles.textTopic}>Community</Text>
+                </View>
 
-        <TouchableOpacity style={styles.btnMid}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconFriends}></SvgXml>
-            <Text style={styles.textInBtn}>Friends</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnStart} onPress={handleShare}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconShareAccount}></SvgXml>
+                        <Text style={styles.textInBtn}>Share Your Account</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnMid}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconRate}></SvgXml>
-            <Text style={styles.textInBtn}>Rate OurZone</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnMid} onPress={() => navigation.navigate('Friend')}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconFriends}></SvgXml>
+                        <Text style={styles.textInBtn}>Friends</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnMid}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconToS}></SvgXml>
-            <Text style={styles.textInBtn}>Terms Of Service</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnMid}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconRate}></SvgXml>
+                        <Text style={styles.textInBtn}>Rate OurZone</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnEnd}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconPP}></SvgXml>
-            <Text style={styles.textInBtn}>Privacy Policy</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
+                <TouchableOpacity style={styles.btnMid} onPress={handleToS}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconToS}></SvgXml>
+                        <Text style={styles.textInBtn}>Terms Of Service</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <View style={styles.frmTopic}>
-          <SvgXml style={styles.icon} xml={iconManager}></SvgXml>
-          <Text style={styles.textTopic}>Manager</Text>
-        </View>
+                <TouchableOpacity style={styles.btnEnd} onPress={handlePP}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconPP}></SvgXml>
+                        <Text style={styles.textInBtn}>Privacy Policy</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnStart} onPress={signOut} >
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconSignOut}></SvgXml>
-            <Text style={styles.textInBtn}>Sign Out</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
 
-        <TouchableOpacity style={styles.btnEnd}>
-          <View style={styles.startSection}>
-            <SvgXml style={styles.icon} xml={iconDeleteAcc}></SvgXml>
-            <Text style={styles.textInBtn}>Delete Account</Text>
-          </View>
-          <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
-        </TouchableOpacity>
-      </ScrollView>
-    </Animated.View>
-  );
+                <View style={styles.frmTopic}>
+                    <SvgXml style={styles.icon} xml={iconManager}></SvgXml>
+                    <Text style={styles.textTopic}>Manager</Text>
+                </View>
+
+
+                <TouchableOpacity style={styles.btnStart} onPress={handleSignOut}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconSignOut}></SvgXml>
+                        <Text style={styles.textInBtn}>Sign Out</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
+
+                <TouchableOpacity style={styles.btnEnd} onPress={confirmDeleteAccount}>
+                    <View style={styles.startSection}>
+                        <SvgXml style={styles.icon} xml={iconDeleteAcc}></SvgXml>
+                        <Text style={styles.textInBtn}>Delete Account</Text>
+                    </View>
+                    <SvgXml style={styles.icon} xml={iconArrowNext}></SvgXml>
+                </TouchableOpacity>
+            </ScrollView >
+        </Animated.View >
+    );
 };
 
 const styles = StyleSheet.create({
