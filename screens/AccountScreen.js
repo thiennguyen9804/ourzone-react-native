@@ -181,7 +181,10 @@ const AccountScreen = ({ navigation }) => {
         });
 
         if (!result.canceled) {
-            uploadImageToFirebase(result.uri);
+            const imageUri = result.assets[0]
+            setSelectedImage(imageUri);
+
+            uploadImageToFirebase(result.assets[0]);
         }
     };
 
