@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { collection, query, where, limit, getDocs, onSnapshot, doc, getDoc } from "firebase/firestore";
+import { collection, query, where, limit, getDocs, onSnapshot, doc, getDoc, updateDoc } from "firebase/firestore";
 import { app, db } from "../firebase";
 import { useDispatch } from "react-redux";
 import { setUserId } from "../slices/userSlice";
@@ -35,9 +35,25 @@ export const useUser = () => {
 			}
 			return Promise.resolve(res);
 		}
-		
-
 	}
 
-	return { getUserByEmail, getUserByUserId };
+	const updateUserByUserId = async (userId, newValue, setUser) => {
+		if(!userId) {
+			throw new Error('updateUserByUserId requires userId');
+		}
+
+		if(!newValue) {
+			throw new Error('updateUserByUserId requires newValue');
+		}
+		const userRef = doc(db, 'user', userId);
+		await updateDoc(userRef, {
+			...newValue
+		});
+
+		if(setUser) {
+			setUser(prev => ({...prev, ...newValue}));
+		}
+	}
+
+	return { getUserByEmail, getUserByUserId, updateUserByUserId };
 }

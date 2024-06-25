@@ -16,10 +16,14 @@ export const useSendImage = () => {
 	// 	console.log(user);
 	// 	throw new Error('userId is not exists');
 	// }
-	const sendImage = async (imageUri, content) => {
+
+	// isImage: post image
+	// not isImage: post video
+	const sendImage = async (imageUri, content, isImage) => {
 		if(!user) {
 			throw new Error('user is not exists, happened in sendImage');
 		}
+		
 		const fetchResponse = await fetch(imageUri);
 		const theBlob = await fetchResponse.blob();
 		const imageRef = ref(storage, `${user.userId}/${Date.now()}`);

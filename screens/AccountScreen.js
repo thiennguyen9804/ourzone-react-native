@@ -4,11 +4,11 @@ import Animated, { SlideInDown, SlideOutDown, SlideInRight, SlideOutLeft, SlideI
 import { SvgXml } from 'react-native-svg';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, updateDoc, getFirestore } from 'firebase/firestore';
-import { auth, db, storage } from '../firebase';
+import { auth, db } from '../firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApplicationContext } from '../hooks/useApplicationContext';
 import { useIsFocused } from '@react-navigation/native';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 
 // Icons
@@ -32,14 +32,17 @@ import iconPP from "../assets/pp-icon";
 import iconManager from "../assets/manage-icon";
 import iconSignOut from "../assets/sign-out-icon";
 import iconDeleteAcc from "../assets/delete-acc-icon";
+import { useUser } from '../hooks/useUser';
 
 
 
 const AccountScreen = ({ navigation }) => {
-    const { user } = useApplicationContext();
+    const { user, setUser } = useApplicationContext();
+    const { updateUserByUserId } = useUser();
+    const storage = getStorage();
     // const [userData, setUserData] = useState(null);
 
-    console.log(user);
+    // console.log(user);
 
     // const selectImage = async () => {
     //     try {
@@ -97,18 +100,21 @@ const AccountScreen = ({ navigation }) => {
         });
 
         if (!result.canceled) {
-            uploadImageToFirebase(result.uri);
+            console.log('result uri', result.assets[0].uri);
+            uploadImageToFirebase(result.assets[0].uri);
         }
     };
 
     const uploadImageToFirebase = async (uri) => {
         try {
             const response = await fetch(uri);
-            const blob = await response.blob();
-            const storageRef = ref(storage, `avatar/${auth.currentUser.uid}`);
-            await uploadBytes(storageRef, blob);
-            const downloadURL = await getDownloadURL(storageRef);
-            updateUserAvatar(downloadURL);
+            const theBlob = await response.blob();
+            const imageRef = ref(storage, `${user.userId}/${Date.now()}`);
+            const uploadTask = await uploadBytesResumable(imageRef, theBlob);
+            const downloadUri = await getDownloadURL(imageRef);
+            updateUserByUserId(user.userId, {
+                avatar: downloadUri
+            }, setUser);
         } catch (error) {
             console.error("Error uploading image: ", error);
             Alert.alert("Upload Error", "Failed to upload image. Please try again.");
@@ -234,7 +240,7 @@ const AccountScreen = ({ navigation }) => {
                 </TouchableOpacity>
 
                 <View style={styles.frmName}>
-                    <Text style={styles.textName}>{user.userName}</Text>
+                    <Text style={styles.textName}>{user.userName || `${user.firstName} ${user.lastName}`}</Text>
                 </View>
 
                 <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>
