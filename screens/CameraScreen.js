@@ -107,7 +107,7 @@ const CameraScreen = ({ navigation }) => {
 	const stopRecord = useCallback(() => {
 		cameraRef.current.stopRecording();
 		console.log('stop record');
-
+		// console.log(imageUri);
 	}, [flashMode, facing]);
 
 	const cancelHandler = () => {
@@ -118,8 +118,12 @@ const CameraScreen = ({ navigation }) => {
 	}
 
 	const submitImage = async () => {
+		
 		try {
-			await sendImage(imageUri, message);
+			if(imageUri)
+				await sendImage(imageUri, message);
+			else if(videoUri) 
+				await sendImage(videoUri, message)
 			setImageUri(null);
 			setVideoUri(null)
 			setMessage('');
