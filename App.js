@@ -55,32 +55,32 @@ export default function App () {
     const fetchUserData = async () => {
       try {
         await SplashScreen.preventAutoHideAsync();
-        console.log("Fetching userData from AsyncStorage");
-        const userData = await AsyncStorage.getItem('userData');
-        console.log("Fetched data: ", userData);
+        // console.log("Fetching userData from AsyncStorage");
+        // const userData = await AsyncStorage.getItem('userData');
+        // console.log("Fetched data: ", userData);
   
-        if (userData) {
-          const parsedData = JSON.parse(userData);
-          console.log("Parsed data: ", parsedData);
-          setIsLogged(parsedData.isLogged);
+        // if (userData) {
+        //   const parsedData = JSON.parse(userData);
+        //   console.log("Parsed data: ", parsedData);
+        //   setIsLogged(parsedData.isLogged);
   
   
-          const userId = parsedData.uid; 
-          const userDocRef = doc(db, 'users', userId);
-          const userDocSnapshot = await getDoc(userDocRef);
+        //   const userId = parsedData.uid; 
+        //   const userDocRef = doc(db, 'users', userId);
+        //   const userDocSnapshot = await getDoc(userDocRef);
   
-          if (userDocSnapshot.exists()) {
-            const userDataFromFirestore = userDocSnapshot.data();
-            console.log("User data from Firestore:", userDataFromFirestore);
+        //   if (userDocSnapshot.exists()) {
+        //     const userDataFromFirestore = userDocSnapshot.data();
+        //     console.log("User data from Firestore:", userDataFromFirestore);
   
             
-          } else {
-            console.log("User document does not exist in Firestore");
-          }
-        }
+        //   } else {
+        //     console.log("User document does not exist in Firestore");
+        //   }
+        // }
   
         if (fontsLoaded) {
-          console.log("Fonts loaded, hiding SplashScreen");
+          // console.log("Fonts loaded, hiding SplashScreen");
           await SplashScreen.hideAsync();
         }
       } catch (error) {
@@ -106,7 +106,7 @@ export default function App () {
               screenOptions={{
                 headerShown: false,
               }}
-              initialRouteName={isLogged ? 'Camera' : 'Start'} 
+              // initialRouteName={isLogged ? 'Camera' : 'Start'}
             >
              
               <Stack.Screen name="Start" component={StartScreen} />

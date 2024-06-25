@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Alert, ScrollView } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Image, Alert, ScrollView, ToastAndroid } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown } from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
 import { auth, db } from '../firebase'; 
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useApplicationContext } from '../hooks/useApplicationContext';
 
 // Icons
 import iconBack from "../assets/back-icon";
@@ -29,75 +30,85 @@ import iconManager from "../assets/manage-icon";
 import iconSignOut from "../assets/sign-out-icon";
 import iconDeleteAcc from "../assets/delete-acc-icon";
 
+
+
 const AccountScreen = ({ navigation }) => {
-  const [userData, setUserData] = useState(null);
-  const auth = getAuth(); 
+  const { user } = useApplicationContext();
 
   useEffect(() => {
-    const fetchUserData = async (uid) => {
-      try {
-        const userDataJSON = await AsyncStorage.getItem('userData');
-        if (userDataJSON) {
-          const userData = JSON.parse(userDataJSON); 
-          const userDoc = await getDoc(doc(db, 'user', userData.uid)); 
-          console.log("User data from database:", userData);
-          setUserData(userData);
-        } else {
-          Alert.alert("Error", "No user data found in AsyncStorage");
-        }
-      } catch (error) {
-        console.error("Error fetching user data: ", error);
-        Alert.alert("Error", "Failed to fetch user data. Please try again.");
-      }
-    }
-    const unsubscribe = onAuthStateChanged(auth, async (user) => {
-      if (user) {
-        try {
-          const userDataFromStorage = await AsyncStorage.getItem('userData');
-          if (userDataFromStorage) {
-            const parsedUserData = JSON.parse(userDataFromStorage);
-            fetchUserData(parsedUserData.userData);
-          } else {
-            // Alert.alert("Error", "No user data found in AsyncStorage");
-          }
-        } catch (error) {
-          console.error("Error fetching user data from AsyncStorage: ", error);
-          Alert.alert("Error", "Failed to fetch user data from AsyncStorage. Please try again.");
-        }
-      } else {
-        setUserData(null); 
-      }
-    });
+    // const fetchUserData = async (uid) => {
+    //   try {
+    //     const userDataJSON = await AsyncStorage.getItem('userData');
+    //     if (userDataJSON) {
+    //       const userData = JSON.parse(userDataJSON); 
+    //       const userDoc = await getDoc(doc(db, 'user', userData.uid)); 
+    //       console.log("User data from database:", userData);
+    //       setUserData(userData);
+    //     } else {
+    //       Alert.alert("Error", "No user data found in AsyncStorage");
+    //     }
+    //   } catch (error) {
+    //     console.error("Error fetching user data: ", error);
+    //     Alert.alert("Error", "Failed to fetch user data. Please try again.");
+    //   }
+    // }
+    // const unsubscribe = onAuthStateChanged(auth, async (user) => {
+    //   if (user) {
+    //     try {
+    //       const userDataFromStorage = await AsyncStorage.getItem('userData');
+    //       if (userDataFromStorage) {
+    //         const parsedUserData = JSON.parse(userDataFromStorage);
+    //         fetchUserData(parsedUserData.userData);
+    //       } else {
+    //         // Alert.alert("Error", "No user data found in AsyncStorage");
+    //       }
+    //     } catch (error) {
+    //       console.error("Error fetching user data from AsyncStorage: ", error);
+    //       Alert.alert("Error", "Failed to fetch user data from AsyncStorage. Please try again.");
+    //     }
+    //   } else {
+    //     setUserData(null); 
+    //   }
+    // });
 
-    const checkInitialUser = async () => {
-      try {
-        const userDataFromStorage = await AsyncStorage.getItem('userData');
-        if (userDataFromStorage) {
-          const parsedUserData = JSON.parse(userDataFromStorage);
-          fetchUserData(parsedUserData.uid);
-        }
-      } catch (error) {
-        console.error("Error checking initial user data: ", error);
-      }
-    };
+    // const checkInitialUser = async () => {
+    //   try {
+    //     const userDataFromStorage = await AsyncStorage.getItem('userData');
+    //     if (userDataFromStorage) {
+    //       const parsedUserData = JSON.parse(userDataFromStorage);
+    //       fetchUserData(parsedUserData.uid);
+    //     }
+    //   } catch (error) {
+    //     console.error("Error checking initial user data: ", error);
+    //   }
+    // };
 
-    checkInitialUser(); 
+    // checkInitialUser(); 
 
-    return () => unsubscribe();
+    // return () => unsubscribe();
   }, []); 
+
+
+
+
   const signOut = async () => {
-    try {
-      await AsyncStorage.removeItem('userData');
-      await auth.signOut(); 
-      Alert.alert('Success', 'Already sign out.');
-      navigation.navigate('Start');
-    } catch (error) {
-      console.error('Error signing out:', error);
-      Alert.alert('Sign Out Failed', 'Failed to sign out. Please try again.');
-    }
-  };
-  if (!userData) {
-    return null; 
+  //   try {
+  //     await AsyncStorage.removeItem('userData');
+  //     await auth.signOut(); 
+  //     Alert.alert('Success', 'Already sign out.');
+  //     navigation.navigate('Start');
+  //   } catch (error) {
+  //     console.error('Error signing out:', error);
+  //     Alert.alert('Sign Out Failed', 'Failed to sign out. Please try again.');
+  //   }
+  // };
+  // if (!userData) {
+  //   console.log('no user data, no account screen')
+  //   return null; 
+    AsyncStorage.removeItem('userId');
+    auth.signOut();
+    navigation.navigate('Start');
+    ToastAndroid.show('Logout successfully!', ToastAndroid.SHORT);
   }
 
   return (
@@ -114,14 +125,14 @@ const AccountScreen = ({ navigation }) => {
 
       <ScrollView style={styles.containerScrollView} >
         <View style={styles.bgAvatar} >
-          <Image style={styles.imgAvatar} source={{ uri: userData.avatar }} />
+          <Image style={styles.imgAvatar} source={{ uri: user.avatar }} />
         </View>
         <TouchableOpacity style={styles.btnChangeAvatar}>
           <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
         </TouchableOpacity>
 
         <View style={styles.frmName}>
-          <Text style={styles.textName}>{userData.firstName} {userData.lastName}</Text>
+          <Text style={styles.textName}>{user.firstName} {user.lastName}</Text>
         </View>
 
         <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>

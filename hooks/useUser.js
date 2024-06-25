@@ -1,5 +1,5 @@
 import { useState } from "react"
-import { collection, query, where, limit, getDocs } from "firebase/firestore";
+import { collection, query, where, limit, getDocs, onSnapshot, doc, getDoc } from "firebase/firestore";
 import { app, db } from "../firebase";
 import { useDispatch } from "react-redux";
 import { setUserId } from "../slices/userSlice";
@@ -19,18 +19,24 @@ export const useUser = () => {
 		return Promise.resolve(res);
 	}
 
-	const getUserByUserId = async userId => {
+	// get real time update
+	// setUser can be optional
+	const getUserByUserId = async (userId, setUser) => {
 		if(!userId) {
 			throw new Error('getUserByUserId requires userId');
 		}
+		
 		let res;
-		const q = query(collection(db, "user"), where("userId", "==", userId), limit(1));
-		const querySnapshot = await getDocs(q);
-		querySnapshot.forEach(doc => {
-			res = doc.data();
-		});
+		const docSnap = await getDoc(doc(db, 'user', userId));
+		if(docSnap.exists()) {
+			res = docSnap.data();
+			if(setUser) {
+				setUser(res);
+			}
+			return Promise.resolve(res);
+		}
+		
 
-		return Promise.resolve(res);
 	}
 
 	return { getUserByEmail, getUserByUserId };

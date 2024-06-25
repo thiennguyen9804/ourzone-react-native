@@ -10,15 +10,16 @@ export const useSendImage = () => {
 	const { createPost } = usePost();
 	const { addNewPostIdToNewsfeed } = useNewsfeed();
  	const [loading, setLoading] = useState(true);
-	if(!user) {
-		throw new Error('user is not exists')
-	}
+	
 
 	// if(!user.userId) {
 	// 	console.log(user);
 	// 	throw new Error('userId is not exists');
 	// }
 	const sendImage = async (imageUri, content) => {
+		if(!user) {
+			throw new Error('user is not exists, happened in sendImage');
+		}
 		const fetchResponse = await fetch(imageUri);
 		const theBlob = await fetchResponse.blob();
 		const imageRef = ref(storage, `${user.userId}/${Date.now()}`);

@@ -32,7 +32,8 @@ const CaptureButton = ({
 					if(pressDownDate.current === now) {
 						// await setCaptureMode('video');
 						console.log(mutableCaptureMode)
-						await startRecord();
+						// await startRecord();
+						console.log('capture image');
 					}
 				}, START_RECORDING_DELAY);
 				return;
@@ -47,10 +48,12 @@ const CaptureButton = ({
 					if(diff < START_RECORDING_DELAY) {
 						// await setCaptureMode('picture');
 						console.log(mutableCaptureMode)
-						await takePhoto();
+						// await takePhoto();
+						console.log('capture image');
 						
 					} else if(diff >= START_RECORDING_DELAY) {
-						await stopRecord();
+						// await stopRecord();
+						console.log('stop recording');
 					}
 				} finally {
 					setTimeout(() => {

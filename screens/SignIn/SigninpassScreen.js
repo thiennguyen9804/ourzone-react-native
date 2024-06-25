@@ -1,63 +1,42 @@
 import React, { useState } from 'react';
-import { Keyboard, ImageBackground, Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Alert } from 'react-native';
+import { Keyboard, ImageBackground, Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Alert, ToastAndroid } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import { signInWithEmailAndPassword } from 'firebase/auth';
+import { onAuthStateChanged, signInWithEmailAndPassword } from 'firebase/auth';
 import { auth, db  } from '../../firebase'; 
 import backIcon from '../../assets/back-icon';
 import hideIcon from '../../assets/eyehide-icon';
 import showIcon from '../../assets/eye-icon';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getAuth ,  sendPasswordResetEmail,  confirmPasswordReset } from "firebase/auth";
-import { doc, getDoc} from 'firebase/firestore';
+import { doc, getDoc } from 'firebase/firestore';
 import { useApplicationContext } from '../../hooks/useApplicationContext';  
+import { useUser } from '../../hooks/useUser';
+import { useNewsfeed } from '../../hooks/useNewsfeed';
 
 const SigninpassScreen = ({ navigation, route }) => {
-  const { email, password, setPassword, setUser, setUserId } = useApplicationContext();
+  const { email, password, setPassword, setUser, setUserId, setNewsfeed, setPostIds } = useApplicationContext();
   const [isSecureEntry, setIsSecureEntry] = useState(true);
-  const [isLogged, setIsLogged] = useState(false);
+  const { getUserByUserId } = useUser();
+  const { getNewsfeedByUserId } = useNewsfeed();
+  
   // const auth = getAuth(); 
 
   const loginWithEmailHandler = async (email, password) => {
     try { 
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
-      const user = userCredential.user;
-      setUserId(user.uid);
-      // console.log('user.uid');
-      setUser(prev => ({...prev, userId}));
-  
-  
-      await AsyncStorage.setItem('userId', userId);
-      const userDocRef = doc(db, 'user', userId); 
-      const userDocSnapshot = await getDoc(userDocRef);
-  
-      if (userDocSnapshot.exists()) {
-  
-        const userDataFromFirestore = userDocSnapshot.data();
-        const firstName = userDataFromFirestore.firstName;
-        const lastName = userDataFromFirestore.lastName;
-        const avatar =userDataFromFirestore.avatar;
-        setUser(prev => ({...prev, ...userDataFromFirestore}));
-       
-        await AsyncStorage.setItem('userId', userId);
-  
-        
-        const userData = {
-          email: user.email,
-          uid: userId,
-          firstName: firstName,
-          lastName: lastName,
-          avatar: avatar,
-          isLogged: true
-        };
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
+      // console.log('userCredential', userCredential);
+      const userIdValue = userCredential.user.uid;
+      setUserId(userIdValue);
+      await AsyncStorage.setItem('userId', userIdValue);
+      await getUserByUserId(userIdValue, setUser);
+			await getNewsfeedByUserId(userIdValue, setNewsfeed, setPostIds);
+      navigation.navigate('Camera');
+      ToastAndroid.show('Login successfully', ToastAndroid.SHORT);
+      // setIsLogged(true);
 
-     
-      setIsLogged(true);
-
-      console.log('Logged in successfully:', user);
-      navigation.navigate('Camera'); 
-    }
-   } catch (error) {
+      // console.log('Logged in successfully:', user);
+      // navigation.navigate('Camera'); 
+    } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.error('Error logging in:', errorCode, errorMessage);
@@ -68,7 +47,7 @@ const SigninpassScreen = ({ navigation, route }) => {
   const handleLogin = () => {
     if (!email || !password) {
       Alert.alert('Error', 'Email or password cannot be empty.');
-      return;
+      // return;
     }
 
     loginWithEmailHandler(email, password);
@@ -94,6 +73,7 @@ const SigninpassScreen = ({ navigation, route }) => {
       Alert.alert('Error', 'Failed to send password reset email. Please try again.');
     }
   };
+  
   return (
     <ImageBackground style={styles.background}>
       <StatusBar barStyle="dark-content" />

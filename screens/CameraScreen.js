@@ -25,6 +25,7 @@ import cancelIcon from '../assets/cancel-icon';
 import sendIcon from '../assets/send-icon';
 import cameraIcon from '../assets/camera-icon';
 import { useSelector } from 'react-redux';
+import { useNewsfeed } from '../hooks/useNewsfeed';
 
 const CameraScreen = ({ navigation }) => {
 	// variables
@@ -43,6 +44,8 @@ const CameraScreen = ({ navigation }) => {
 	const [cameraStatus, requestCameraPermission] = Camera.useCameraPermissions();
 	const [microphoneStatus, requestMicrophonePermission] = Camera.useMicrophonePermissions();
 	const { loading, setLoading, sendImage } = useSendImage();
+	const { user, userId, setNewsfeed, setPostIds } = useApplicationContext();
+	const { getNewsfeedByUserId } = useNewsfeed();
 	// end variables
 
 	// functions
@@ -116,7 +119,6 @@ const CameraScreen = ({ navigation }) => {
 
 	const submitImage = async () => {
 		try {
-
 			await sendImage(imageUri, message);
 			setImageUri(null);
 			setVideoUri(null)
@@ -138,6 +140,13 @@ const CameraScreen = ({ navigation }) => {
 		requestMicrophonePermission();
 		// cameraRef.current.resumePreview();
 	}, []);
+
+	// update newsfeed
+	useEffect(() => {
+		if(userId) {
+			getNewsfeedByUserId(userId, setNewsfeed, setPostIds);
+		}
+	}, [])
 
 	// ui render
 	return (
