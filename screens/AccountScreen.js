@@ -123,6 +123,47 @@ const AccountScreen = ({ navigation }) => {
     const { firstName, lastName } = userData;
     const fullName = `${firstName} ${lastName}`;
 
+    // const selectImage = async () => {
+    //     try {
+    //         const permissionResult = await ImagePicker.requestMediaLibraryPermissionsAsync();
+
+    //         if (permissionResult.granted === false) {
+    //             Alert.alert("Permission to access camera roll is required!");
+    //             return;
+    //         }
+
+    //         const pickerResult = await ImagePicker.launchImageLibraryAsync({
+    //             mediaType: ImagePicker.MediaTypeOptions.Images,
+    //             aspect: [3, 3],
+    //             quality: 1,
+    //             base64: true
+    //         });
+
+    //         if (!pickerResult.canceled) {
+    //             const imageUri = pickerResult.assets[0]
+    //             setSelectedImage(imageUri);
+
+    //             const response = await fetch(selectedImage.uri);
+    //             const blod = await response.blob();
+    //             const filename = selectedImage.uri.substring(selectedImage.uri.lastIndexOf('/') + 1);
+    //             var ref = firebase.storage().ref().child('images/' + filename).put(blod);
+    //             try {
+    //                 await ref;
+
+    //             } catch (e) {
+    //                 console.error(e);
+    //             }
+
+    //             Alert.alert("Photo uploaded!");
+
+    //         }
+    //     } catch (error) {
+    //         console.error("Error selecting image: ", error);
+    //         Alert.alert("Error", "Failed to select image. Please try again.");
+    //     }
+
+    // };
+
     const handleSignOut = async () => {
         try {
             await auth.signOut();
