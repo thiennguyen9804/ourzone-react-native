@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Linking, Share, Text, TouchableOpacity, Image, Alert, ScrollView, ToastAndroid } from 'react-native';
-import Animated, { SlideInDown, SlideOutDown, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
+import Animated, { SlideInDown, SlideOutDown, SlideInRight, SlideOutLeft, SlideInLeft, SlideOutRight } from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc } from 'firebase/firestore';
@@ -35,98 +35,16 @@ import iconDeleteAcc from "../assets/delete-acc-icon";
 
 const AccountScreen = ({ navigation }) => {
     const { user } = useApplicationContext();
-    const [userData, setUserData] = useState(null);
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [uploading, setUploading] = useState(false);
-    const isFocused = useIsFocused();
+    // const [userData, setUserData] = useState(null);
 
-    useEffect(() => {
-        const fetchUserData = async (uid) => {
-            try {
-                const userDataJSON = await AsyncStorage.getItem('userData');
-                if (userDataJSON) {
-                    const userData = JSON.parse(userDataJSON);
-                    const userDoc = await getDoc(doc(db, 'user', userData.uid));
-                    console.log("User data from database:", userData);
-                    setUserData(userData);
-                } else {
-                    Alert.alert("Error", "No user data found in AsyncStorage");
-                }
-            } catch (error) {
-                console.error("Error fetching user data: ", error);
-                Alert.alert("Error", "Failed to fetch user data. Please try again.");
-            }
-        }
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const userDataFromStorage = await AsyncStorage.getItem('userData');
-                    if (userDataFromStorage) {
-                        const parsedUserData = JSON.parse(userDataFromStorage);
-                        fetchUserData(parsedUserData.userData);
-                    } else {
-                        // Alert.alert("Error", "No user data found in AsyncStorage");
-                    }
-                } catch (error) {
-                    console.error("Error fetching user data from AsyncStorage: ", error);
-                    Alert.alert("Error", "Failed to fetch user data from AsyncStorage. Please try again.");
-                }
-            } else {
-                setUserData(null);
-            }
-        });
-    });
-
-    const fetchUserData = async (user) => {
-        try {
-            const userDoc = await getDoc(doc(db, 'user', user.uid));
-            if (userDoc.exists()) {
-                setUserData(userDoc.data());
-                setSelectedImage({ uri: userDoc.data().avatar });
-            } else {
-                Alert.alert("Error", "No user data found");
-            }
-        } catch (error) {
-            console.error("Error fetching user data: ", error);
-            Alert.alert("Error", "Failed to fetch user data. Please try again.");
-        }
-    };
-
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                fetchUserData(user);
-            } else {
-                navigation.navigate('Start');
-            }
-        });
-
-        return () => unsubscribe();
-    }, [navigation]);
-
-
-
-    useEffect(() => {
-        if (isFocused) {
-            const user = auth.currentUser;
-            if (user) {
-                fetchUserData(user);
-            }
-        }
-    }, [isFocused]);
-
-    if (!userData) {
-        return null;
-    }
-
-    const { firstName, lastName } = userData;
-    const fullName = `${firstName} ${lastName}`;
+    console.log(user);
 
     const handleSignOut = async () => {
         try {
-            await auth.signOut();
-            console.log('User signed out successfully');
+            auth.signOut();
+            AsyncStorage.removeItem('userId');
+            // console.log('User signed out successfully');
+            ToastAndroid.show('Logout successfully', ToastAndroid.SHORT);
             navigation.navigate('Start')
         } catch (e) {
             console.error('Error signing out:', e);
@@ -210,8 +128,8 @@ const AccountScreen = ({ navigation }) => {
     return (
         <Animated.View
             style={styles.container}
-            entering={SlideInRight}
-            exiting={SlideOutLeft}
+            entering={SlideInLeft}
+            exiting={SlideOutRight}
         >
             <View>
                 <TouchableOpacity style={styles.btnBack} onPress={() => navigation.navigate('Camera')}>
@@ -221,14 +139,14 @@ const AccountScreen = ({ navigation }) => {
 
             <ScrollView style={styles.containerScrollView} >
                 <View style={styles.bgAvatar}>
-                    <Image style={styles.imgAvatar} source={selectedImage} />
+                    <Image style={styles.imgAvatar} source={{uri: user.avatar}} />
                 </View>
                 <TouchableOpacity style={styles.btnChangeAvatar}>
                     <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
                 </TouchableOpacity>
 
                 <View style={styles.frmName}>
-                    <Text style={styles.textName}>{fullName}</Text>
+                    <Text style={styles.textName}>{user.userName}</Text>
                 </View>
 
                 <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>
