@@ -16,9 +16,8 @@ const UserFriendCard = ({ username, navigation, avatar }) => {
   };
 
   const handleDelete = (username) => {
-    // Perform delete action here
     alert(`Deleted ${username}`);
-    closeModal(); // Close the modal after deletion
+    closeModal();
   };
 
   return (
@@ -79,6 +78,8 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginHorizontal: 10,
     color: '#738F81',
+    fontFamily:'OpenSans',
+
   },
   messButton: {
     flexDirection: 'row',

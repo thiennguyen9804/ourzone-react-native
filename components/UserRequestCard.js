@@ -127,6 +127,8 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginHorizontal: 10,
     color: '#738F81',
+    fontFamily:'OpenSans',
+
   },
   acceptButton: {
     flexDirection: 'row',
@@ -144,6 +146,8 @@ const styles = StyleSheet.create({
     color: '#2D2D2D',
     marginLeft: 5,
     marginRight:10,
+    fontFamily:'OpenSansBold',
+
   },
   modalContainer: {
     flex: 1,
@@ -197,7 +201,7 @@ const styles = StyleSheet.create({
     },
     buttonText: {
     fontSize: 16,
-    fontWeight: 'bold',
+    fontFamily:'OpenSansBold',
     color: '#000000',
     },
 });

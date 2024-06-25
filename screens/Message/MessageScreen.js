@@ -8,8 +8,8 @@ import UserMessageCard from '../../components/UserMessageCard';
 const MessageScreen = ({ navigation }) => {
 
     const friends = [
-        { id: '1', username: 'John Doe', avatar: 'https://via.placeholder.com/150' },
-        { id: '2', username: 'Jane Smith', avatar: 'https://via.placeholder.com/150' }
+        { id: '1', username: 'John Doe', avatar: 'https://via.placeholder.com/150',chat:"trôii" },
+        { id: '2', username: 'Jane Smith', avatar: 'https://via.placeholder.com/150',chat:"ngủ i" }
     ];
     
     const renderHeader = () => (
@@ -30,10 +30,10 @@ const MessageScreen = ({ navigation }) => {
         <FlatList
             ListHeaderComponent={renderHeader}
             style={styles.scrollView}
-            data={friends}  // Flat data array
-            renderItem={renderItem}  // Render function for each item
+            data={friends} 
+            renderItem={renderItem}  
             keyExtractor={(item) => item.id}
-            ItemSeparatorComponent={() => <View style={styles.separator} />} // Add spacing between items
+            ItemSeparatorComponent={() => <View style={styles.separator} />} 
             ListEmptyComponent={() => (
                 <View style={styles.emptyContainer}>
                     <Text style={styles.emptyText}>No messages to display</Text>
@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
     },
     headerText: {
         fontSize: 24,
-        fontWeight: 'bold',
+        fontFamily:'OpenSansBold',
         marginLeft: 10,
         color: "#AAC2B3",
     },

@@ -163,6 +163,8 @@ const styles = {
     textAlign: 'center',
     color: '#f8fff8',
     fontSize: 30,
+    fontFamily: 'OpenSansBold',
+
   },
   backButton: {
     width: 70,
@@ -179,6 +181,8 @@ const styles = {
     textAlign: 'center',
     color: '#ECF4F4',
     fontSize: 20,
+    fontFamily:'OpenSans',
+
   },
   line: {
     width: '80%',
@@ -207,6 +211,8 @@ const styles = {
     textAlign: 'center',
     backgroundColor: 'transparent',
     color: '#738F81',
+    fontFamily:'OpenSans',
+
   },
   recyclerView: {
     width: '100%',
@@ -221,6 +227,9 @@ const styles = {
     
   },
   sectionHeader: {
+    fontFamily: 'OpenSansBold',
+    fontWeight: 'bold',
+
     color: '#FFFFFF',
     fontSize: 20,
     marginBottom: 10,
@@ -233,7 +242,7 @@ const styles = {
     marginTop: 15,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 21, // Assuming rounded corners
+    borderRadius: 21, 
   },
   shareCard: {
     backgroundColor: '#738F81',
@@ -241,7 +250,7 @@ const styles = {
     height: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 100, // Circle shape
+    borderRadius: 100, 
   },
   shareCardIn: {
     backgroundColor: '#F8FFF8',
@@ -261,24 +270,30 @@ const styles = {
     textAlign: 'center',
     color: '#738F81',
     fontSize: 19,
+    fontFamily:'OpenSans',
+
+    
   },
   shareButton: {
     width: 45,
     height: 45,
   },
   headerRow: {
-    flexDirection: 'row', // Arrange items horizontally
-    alignItems: 'center', // Align items vertically in the middle
+    flexDirection: 'row', 
+    alignItems: 'center', 
     marginBottom: 10,
+    
   },
   searchIcon: {
-    width: 20, // Adjust width and height as needed
+    width: 20,
     height: 20,
-    marginRight: 10, // Add margin between icon and text
+    marginRight: 10, 
   },
   sectionHeader: {
     color: '#FFFFFF',
     fontSize: 20,
+    fontFamily: 'OpenSansBold',
+
   },
 };
 

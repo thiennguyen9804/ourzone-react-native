@@ -97,6 +97,8 @@ const styles = StyleSheet.create({
     fontSize: 17,
     marginHorizontal: 10,
     color: '#738F81',
+    fontFamily:'OpenSans',
+
   },
   addButton: {
     flexDirection: 'row',
@@ -112,6 +114,8 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#2D2D2D',
     marginLeft: 5,
+    fontFamily:'OpenSansBold',
+
   },
   modalContainer: {
     flex: 1,

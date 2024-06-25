@@ -16,6 +16,7 @@ const UserMessageCard = ({ username, navigation, chat,avatar }) => {
                 <Text style={styles.chatText}>{chat}</Text>
             </View>
       </TouchableOpacity>
+      
     </View>
   );
 };
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
   usernameText: {
     fontSize: 17,
     marginHorizontal: 10,
-    fontWeight: 'bold',
+    fontFamily:'OpenSansBold',
 
     color: '#738F81',
   },
@@ -101,6 +102,7 @@ const styles = StyleSheet.create({
   chatText: {
     fontSize: 12,
     color: '#A1A1A1',
+    fontFamily:'OpenSans',
   },
 });
 

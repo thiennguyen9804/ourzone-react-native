@@ -6,6 +6,14 @@ import cameraIcon from '../../assets/camera-icon';
 import fireIcon from '../../assets/fire-icon';
 
 const MessageBoxScreen = ({ navigation }) => {
+    const messages = [
+        { id: '1', text: 'Mày làm gì đóa?', isSent: true },
+        { id: '2', text: 'Tao code', isSent: false },
+        { id: '3', text: 'Sao t lại đi đăng kí mấy quỷ này ta', isSent: false },
+        { id: '4', text: 'Ngủ u', isSent: true },
+        { id: '5', text: 'Chưa xong tròi oi', isSent: false },
+    ];
+
     const renderHeader = () => (
         <View style={styles.headerContainer}>
             <TouchableOpacity onPress={() => navigation.goBack()}>            
@@ -36,14 +44,20 @@ const MessageBoxScreen = ({ navigation }) => {
         </View>
     );
 
+    const renderItem = ({ item }) => (
+        <View style={[styles.messageContainer, item.isSent ? styles.sentMessage : styles.receivedMessage]}>
+            <Text style={styles.messageText}>{item.text}</Text>
+        </View>
+    );
+
     return (
         <View style={styles.container}>
             <FlatList
                 ListHeaderComponent={renderHeader}
                 style={styles.scrollView}
-                data={[]}  
-                renderItem={null}  
-                keyExtractor={(item, index) => index.toString()}
+                data={messages}  
+                renderItem={renderItem}  
+                keyExtractor={(item) => item.id}
                 ListEmptyComponent={() => (
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>No messages to display</Text>
@@ -66,7 +80,7 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 40,
         paddingBottom: 20,
-        paddingHorizontal: 5,
+        paddingHorizontal: 10,
     },
     avatarContainer: {
         flexDirection: 'row',
@@ -89,9 +103,11 @@ const styles = StyleSheet.create({
     },
     usernameText: {
         fontSize: 18,
-        fontWeight: 'bold',
+       
         color: '#738F81',
         marginLeft: 10,
+        fontFamily:'OpenSansBold',
+
     },
     footerContainer: {
         flexDirection: 'row',
@@ -107,6 +123,8 @@ const styles = StyleSheet.create({
         color: "#fff",
         borderRadius: 20,
         backgroundColor: '#AAC2B3',
+        fontFamily:'OpenSans',
+
     },
     scrollView: {
         backgroundColor: '#fff',
@@ -120,6 +138,8 @@ const styles = StyleSheet.create({
     emptyText: {
         fontSize: 18,
         color: '#777',
+        fontFamily:'OpenSans',
+
     },
     iconBack: {
         padding: 10,
@@ -127,6 +147,26 @@ const styles = StyleSheet.create({
     },
     icon: {
         padding: 10,
+    },
+    messageContainer: {
+        marginVertical: 10,
+        marginHorizontal: 20,
+        padding: 15,
+        borderRadius: 10,
+        maxWidth: '70%',
+    },
+    sentMessage: {
+        alignSelf: 'flex-end',
+        backgroundColor: '#DCF8C6',
+    },
+    receivedMessage: {
+        alignSelf: 'flex-start',
+        backgroundColor: '#ECECEC',
+    },
+    messageText: {
+        fontSize: 16,
+        fontFamily:'OpenSans',
+
     },
 });
 
