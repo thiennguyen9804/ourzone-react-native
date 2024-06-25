@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Linking, Text, TouchableOpacity, Image, Alert, ScrollView, ToastAndroid } from 'react-native';
+import { StyleSheet, View, Linking, Share, Text, TouchableOpacity, Image, Alert, ScrollView, ToastAndroid } from 'react-native';
 import Animated, { SlideInDown, SlideOutDown, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
@@ -146,7 +146,7 @@ const AccountScreen = ({ navigation }) => {
 
     const handleShare = async () => {
         const userId = auth.currentUser.uid;
-        const url = `https://yourapp.com/profile/${userId}`;
+        const url = `https://ourzone.com/profile/${userId}`;
 
         try {
             const result = await Share.share({
