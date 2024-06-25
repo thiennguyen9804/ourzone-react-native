@@ -1,38 +1,12 @@
 import { Image, StyleSheet, View, Text, useWindowDimensions, TextInput } from 'react-native';
-
 import { formatDistanceStrict } from 'date-fns';
 import { useEffect, useState } from 'react';
 import { useUser } from '../hooks/useUser';
 import { usePost } from '../hooks/usePost';
 import { formatDistanceToNowStrict } from 'date-fns/formatDistanceToNowStrict';
 
-export default function PostImageDetail({postId}) {
-	const [currentUser, setCurrentUser] = useState({});
-	const [currentPost, setCurrentPost] = useState({});
-	const { getUserByUserId } = useUser();
-	const { getPostByPostId } = usePost();
-	useEffect(() => {
-		(async () => {
-			try {
-				let currentPostValue = await getPostByPostId(postId).catch(reason => console.log(reason));
-				setCurrentPost(currentPostValue);
-			} catch(err) {
-				console.log(err);
-			}
-		})();
-	}, [setCurrentPost]);
-
-	useEffect(() => {
-		(async () => {
-			try {
-				let currentUserValue = await getUserByUserId(currentPost.userId);
-				setCurrentUser(currentUserValue);
-			} catch(err) {
-				console.log(err.message);
-			}
-
-		})();
-	}, [setCurrentUser, currentPost]);
+export default function PostImageDetail({currentPost, currentUser}) {
+	
 
 	const { height } = useWindowDimensions();
 	// console.log('currentPost', currentPost);
@@ -44,9 +18,9 @@ export default function PostImageDetail({postId}) {
 			<View style={styles.imageContainer}>
 				<View style={styles.innerImageContainer}>
 					<Image style={styles.image} resizeMode='cover' source={{uri: currentPost.image}}/>
-					<View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
+					{currentPost.content && <View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
 						<TextInput multiline textAlign='center' style={styles.messageInput} editable={false} value={currentPost.content}/>
-					</View>
+					</View>}
 				</View>
 				
 			</View>
@@ -61,7 +35,7 @@ export default function PostImageDetail({postId}) {
 				</View>
 
 				{/* name */}
-				<Text style={styles.userName}>{`${currentUser.firstName} ${currentUser.lastName}`}</Text>
+				<Text style={styles.userName}>{`${currentUser.userName || ''}`}</Text>
 
 				{/* time */}
 				{/* <Text style={styles.timeTxt}>{formatDistanceToNowStrict(new Date((currentPost.createdAt.seconds * 1000) || 0))}</Text>	 */}

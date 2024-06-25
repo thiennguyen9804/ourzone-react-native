@@ -9,6 +9,8 @@ import { manipulateAsync, FlipType } from 'expo-image-manipulator';
 import Animated, { SlideInDown, SlideInLeft, SlideInUp, SlideOutRight, SlideOutUp, useSharedValue } from 'react-native-reanimated';
 import { Gesture, GestureDetector } from 'react-native-gesture-handler';
 import { useApplicationContext } from '../hooks/useApplicationContext';
+import { useIsFocused } from '@react-navigation/native';
+import { useSendImage } from '../hooks/useSendImage';
 
 // widgets
 import CaptureButton from '../widgets/CaptureButton';
@@ -23,9 +25,11 @@ import cancelIcon from '../assets/cancel-icon';
 import sendIcon from '../assets/send-icon';
 import cameraIcon from '../assets/camera-icon';
 import { useSelector } from 'react-redux';
+import { useNewsfeed } from '../hooks/useNewsfeed';
 
 const CameraScreen = ({ navigation }) => {
 	// variables
+	const isFocused = useIsFocused();
 	const [flashMode, setFlashMode] = useState(FlashMode.off);
 	const [facing, setFacing] = useState(CameraType.back);
 	const [permission, requestPermission] = useCameraPermissions();
@@ -39,31 +43,34 @@ const CameraScreen = ({ navigation }) => {
 	const isPressingButton = useSharedValue(false);
 	const [cameraStatus, requestCameraPermission] = Camera.useCameraPermissions();
 	const [microphoneStatus, requestMicrophonePermission] = Camera.useMicrophonePermissions();
+	const { loading, setLoading, sendImage } = useSendImage();
+	const { user, userId, setNewsfeed, setPostIds } = useApplicationContext();
+	const { getNewsfeedByUserId } = useNewsfeed();
 	// end variables
 
 	// functions
 	const toggleFlashMode = () => setFlashMode(curr => curr === FlashMode.off ? FlashMode.on : FlashMode.off);
 	const toggleFacing = () => setFacing(curr => curr === CameraType.front ? CameraType.back : CameraType.front);
 	const toggleStatus = () => setStatus(curr => {
-		console.log(curr);
 		return !curr
 	})
+
 	const takePhoto = useCallback(async () => {
 		try {
 			if (cameraRef.current) {
 				const options = { quality: 0.5, base64: true, skipProcessing: true, isImageMirror: false };
 				const data = await cameraRef.current.takePictureAsync(options);
 
-				// if(facing === 'front') {
-				// 	const manipResult = await manipulateAsync(
-				// 		data.uri,
-				// 		[{rotate: 180}, {flip: FlipType.Vertical}]
-				// 	);
+				if(facing === CameraType.front) {
+					const manipResult = await manipulateAsync(
+						data.uri,
+						[{rotate: 180}, {flip: FlipType.Vertical}]
+					);
 
-				// 	setImageUri(manipResult.uri);
-				// } else {
-				// 	setImageUri(data.uri);
-				// }
+					setImageUri(manipResult.uri);
+				} else {
+					setImageUri(data.uri);
+				}
 
 
 				setImageUri(data.uri)
@@ -100,13 +107,30 @@ const CameraScreen = ({ navigation }) => {
 	const stopRecord = useCallback(() => {
 		cameraRef.current.stopRecording();
 		console.log('stop record');
-
+		// console.log(imageUri);
 	}, [flashMode, facing]);
 
 	const cancelHandler = () => {
 		setImageUri(null);
 		setVideoUri(null)
+		setMessage('');
 		toggleStatus();
+	}
+
+	const submitImage = async () => {
+		
+		try {
+			if(imageUri)
+				await sendImage(imageUri, message);
+			else if(videoUri) 
+				await sendImage(videoUri, message)
+			setImageUri(null);
+			setVideoUri(null)
+			setMessage('');
+			toggleStatus();
+		} catch(err) {
+			console.log(err.message);
+		}
 	}
 
 	const setIsPressingButton = (_isPressingButton) => {
@@ -118,7 +142,15 @@ const CameraScreen = ({ navigation }) => {
 	useEffect(() => {
 		requestCameraPermission();
 		requestMicrophonePermission();
+		// cameraRef.current.resumePreview();
 	}, []);
+
+	// update newsfeed
+	useEffect(() => {
+		if(userId) {
+			getNewsfeedByUserId(userId, setNewsfeed, setPostIds);
+		}
+	}, [])
 
 	// ui render
 	return (
@@ -152,13 +184,13 @@ const CameraScreen = ({ navigation }) => {
 				// pre cap
 				<>
 					{/* camera */}
-					<Camera
+					{isFocused && <Camera
 						ref={cameraRef}
 						style={styles.camera}
 						type={facing}
 						flashMode={flashMode}
 						ratio='1:1'
-					/>
+					/>}
 
 					<View style={styles.captureSection}>
 						{/* flash */}
@@ -222,7 +254,7 @@ const CameraScreen = ({ navigation }) => {
 						</TouchableOpacity>
 
 						{/* send */}
-						<TouchableOpacity style={styles.captureBtn} onPress={takePhoto}>
+						<TouchableOpacity style={styles.captureBtn} onPress={submitImage}>
 							<View style={styles.cameraBtnInner}>
 								<SvgXml style={{ margin: 'auto' }} xml={sendIcon} />
 							</View>

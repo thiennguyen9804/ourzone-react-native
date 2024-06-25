@@ -1,13 +1,61 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, View, Text, TouchableOpacity, Image, Touchable } from 'react-native';
 import Animated, { SlideInDown, SlideInUp, SlideOutDown, SlideOutUp } from "react-native-reanimated";
 import { SvgXml } from 'react-native-svg';
 import { TextInput } from 'react-native-gesture-handler';
+import { db, auth } from '../../firebase';
+import { doc, updateDoc, onSnapshot } from 'firebase/firestore';
+import { onAuthStateChanged } from 'firebase/auth';
+
 //icon
 import iconBack from "../../assets/back-icon";
 
 const ChangeEmailScreen = ({ navigation }) => {
-    const [text, setText] = useState('');
+    const [email, setEmail] = useState('');
+    const [userId, setUserId] = useState(null);
+
+    useEffect(() => {
+        const unsubscribeAuth = onAuthStateChanged(auth, (user) => {
+            if (user) {
+                setUserId(user.uid);
+                const userDocRef = doc(db, 'user', user.uid);
+                const unsubscribeSnapshot = onSnapshot(userDocRef, (doc) => {
+                    if (doc.exists()) {
+                        const userData = doc.data();
+                        setEmail(userData.email || '');
+                    } else {
+                        console.log('No such document!');
+                    }
+                });
+
+                return () => {
+                    unsubscribeSnapshot();
+                };
+            }
+        });
+
+        return () => {
+            unsubscribeAuth();
+        };
+    }, []);
+
+
+    const handleSave = async () => {
+        if (userId) {
+            try {
+                const userDocRef = doc(db, 'user', userId);
+                await updateDoc(userDocRef, {
+                    email: email.trim()
+                });
+                console.log("Document written with ID: ", userId);
+                navigation.navigate('Account');
+            } catch (e) {
+                console.error("Error adding document: ", e);
+            }
+        }
+    };
+
+
     return (
         <Animated.View
             style={styles.container}
@@ -20,17 +68,16 @@ const ChangeEmailScreen = ({ navigation }) => {
 
             <View style={styles.frmTopic}>
                 <Text style={styles.textTopic}
-
                 >Enter Your Email</Text>
             </View>
 
             <TextInput style={styles.frmEdit}
                 placeholder="Enter your Email"
-                value={text}
-                onChange={setText} ></TextInput>
+                value={email}
+                onChangeText={text => setEmail(text)} ></TextInput>
 
 
-            <TouchableOpacity style={styles.btnSave}>
+            <TouchableOpacity style={styles.btnSave} onPress={handleSave}>
                 <Text style={styles.textInBtn}>Save</Text>
             </TouchableOpacity>
 

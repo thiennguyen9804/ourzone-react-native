@@ -1,33 +1,38 @@
 import React from 'react';
-import { ImageBackground,Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity } from 'react-native';
+import { ImageBackground,Text, TextInput, View, StyleSheet, SafeAreaView, StatusBar, TouchableOpacity, Keyboard } from 'react-native';
 import backIcon from "../../assets/back-icon";
 import { SvgXml } from "react-native-svg";
-
+import { TouchableWithoutFeedback } from 'react-native-gesture-handler';
+import { useApplicationContext } from '../../hooks/useApplicationContext';
 
 const SigninemailScreen=({ navigation })=>{
-    const [email, onChangeText] = React.useState('');
+    const { email, setEmail } = useApplicationContext();
     return(
-        <ImageBackground style={{height:'100%',width:'100%',backgroundColor:'#AAC2B3'}} >
-        <StatusBar barStyle="dark-content" />
-        <SafeAreaView>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+            <ImageBackground  style={{height:'100%',width:'100%',backgroundColor:'#AAC2B3'}} >
+                <StatusBar barStyle="dark-content" />
+                <SafeAreaView>
+                    <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Start')}>
+                        <SvgXml style={styles.backIcon} rotation={0} xml={backIcon} />
+                    </TouchableOpacity>
+                    <Text style={styles.txt}>Enter your email: </Text>
+                <View>
 
-            <TouchableOpacity style={styles.btn} onPress={() => navigation.navigate('Start')}>
-                <SvgXml style={styles.backIcon} rotation={0} xml={backIcon} />
+                {/* email text input */}
+                <TextInput
+                    style={styles.input}
+                    autoCapitalize='none'
+                    onChangeText={setEmail}
+                    placeholder="Email address..."
+                    value={email}
+                />
+                </View>
+                <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SigninPass')}>
+                    <Text style={styles.text}>Continue</Text>
                 </TouchableOpacity>
-                <Text style={styles.txt}>Enter your email: </Text>
-           <View>
-           <TextInput
-        style={styles.input}
-        onChangeText={onChangeText}
-         placeholder="Email address..."
-        value={email}
-      />
-           </View>
-           <TouchableOpacity style={styles.btncontinue} onPress={() => navigation.navigate('SigninPass',{ email })}>
-            <Text style={styles.text}>Continue</Text>
-          </TouchableOpacity>
-        </SafeAreaView>
-        </ImageBackground>
+                </SafeAreaView>
+            </ImageBackground>
+        </TouchableWithoutFeedback>
     );
 };
 
