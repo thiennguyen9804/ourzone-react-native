@@ -1,11 +1,9 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import arrowMessIcon from '../../assets/arrow-mess-icon';  
 import cameraIcon from '../../assets/camera-icon';
 import fireIcon from '../../assets/fire-icon';
-import UserMessageCard from '../../components/UserMessageCard';
-
 
 const MessageBoxScreen = ({ navigation }) => {
     const renderHeader = () => (
@@ -13,7 +11,12 @@ const MessageBoxScreen = ({ navigation }) => {
             <TouchableOpacity onPress={() => navigation.goBack()}>            
                 <SvgXml xml={arrowMessIcon} style={styles.iconBack}/>
             </TouchableOpacity>    
-            <UserMessageCard style={styles.user} username={"Nguyeen" }></UserMessageCard>
+            <View style={styles.avatarContainer}>
+                <View style={styles.avatarOuter}>
+                    <Image style={styles.avatar} source={{ uri: 'https://via.placeholder.com/150' }} />
+                </View>
+                <Text style={styles.usernameText}>name</Text>      
+            </View>
         </View>
     );
 
@@ -27,7 +30,7 @@ const MessageBoxScreen = ({ navigation }) => {
                 placeholder="Type a message..."
                 placeholderTextColor="#fff"
             />
-            <TouchableOpacity >            
+            <TouchableOpacity>            
                 <SvgXml xml={fireIcon} style={styles.icon}/>
             </TouchableOpacity> 
         </View>
@@ -63,6 +66,32 @@ const styles = StyleSheet.create({
         alignItems: 'center',
         paddingTop: 40,
         paddingBottom: 20,
+        paddingHorizontal: 5,
+    },
+    avatarContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        marginLeft: 20,
+    },
+    avatarOuter: {
+        width: 60,
+        height: 60,
+        justifyContent: 'center',
+        alignItems: 'center',
+        backgroundColor: '#738F81',
+        borderRadius: 30,
+        overflow: 'hidden',
+    },
+    avatar: {
+        width: 54,
+        height: 54,
+        borderRadius: 27,
+    },
+    usernameText: {
+        fontSize: 18,
+        fontWeight: 'bold',
+        color: '#738F81',
+        marginLeft: 10,
     },
     footerContainer: {
         flexDirection: 'row',
@@ -99,11 +128,6 @@ const styles = StyleSheet.create({
     icon: {
         padding: 10,
     },
-    user:
-    {
-        width: '50%', 
-        height: 50, 
-    }
 });
 
 export default MessageBoxScreen;

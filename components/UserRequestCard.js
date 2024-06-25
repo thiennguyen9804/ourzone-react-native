@@ -1,10 +1,14 @@
 
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal } from 'react-native';
+import DeleteModal from './DeleteModal';
 
 
-const UserRequestCard = ({ username, navigation }) => {
+
+const UserRequestCard = ({ username, avatar }) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [modalVisible, setModalVisible] = useState(false);
+
 
   const handleCardPress = () => {
     setShowConfirmDialog(true);
@@ -13,14 +17,26 @@ const UserRequestCard = ({ username, navigation }) => {
   const handleCloseDialog = () => {
     setShowConfirmDialog(false);
   };
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const handleDelete = (username) => {
+    alert(`Deleted ${username}`);
+    closeModal();
+  };
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         <View style={styles.avatarOuter}>
-        <Image style={styles.avatar} source={require('../assets/avatar-picture.jpg') }/>
+           <Image style={styles.avatar} source={{uri: avatar} }/>
             </View>
       </View>
-      <TouchableOpacity style={styles.usernameButton}>
+      <TouchableOpacity style={styles.usernameButton} onPress={openModal}>
         <Text style={styles.usernameText}>{username}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.acceptButton}  onPress={handleCardPress}>
@@ -47,7 +63,8 @@ const UserRequestCard = ({ username, navigation }) => {
           </View>
         </View>
       </Modal>
-      
+      <DeleteModal visible={modalVisible} closeModal={closeModal} username={username} onDelete={handleDelete} />
+
     </View>
   );
 };

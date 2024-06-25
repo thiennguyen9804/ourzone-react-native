@@ -1,23 +1,40 @@
-
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import arrowLeftIcon from '../assets/arrow-left-icon';
+import DeleteModal from './DeleteModal';
 
-const UserFriendCard = ({ username, navigation }) => {
+const UserFriendCard = ({ username, navigation, avatar }) => {
+  const [modalVisible, setModalVisible] = useState(false);
+
+  const openModal = () => {
+    setModalVisible(true);
+  };
+
+  const closeModal = () => {
+    setModalVisible(false);
+  };
+
+  const handleDelete = (username) => {
+    // Perform delete action here
+    alert(`Deleted ${username}`);
+    closeModal(); // Close the modal after deletion
+  };
+
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
-        <View style={styles.avatarOuter}>
-         <Image style={styles.avatar} source={require('../assets/avatar-picture.jpg') }/>
-            </View>
+        <View >
+          <Image style={styles.avatar} source={{ uri: avatar }} />
+        </View>
       </View>
-      <TouchableOpacity style={styles.usernameButton}>
+      <TouchableOpacity style={styles.usernameButton} onPress={openModal}>
         <Text style={styles.usernameText}>{username}</Text>
       </TouchableOpacity>
       <TouchableOpacity style={styles.messButton} onPress={() => navigation.navigate('MessageBox')}>
-        <SvgXml  xml={ arrowLeftIcon}></SvgXml>
+        <SvgXml xml={arrowLeftIcon}></SvgXml>
       </TouchableOpacity>
+      <DeleteModal visible={modalVisible} closeModal={closeModal} username={username} onDelete={handleDelete} />
     </View>
   );
 };
@@ -48,25 +65,9 @@ const styles = StyleSheet.create({
     backgroundColor: '#F8FFF8',
     borderRadius: 40,
   },
-  avatarMiddle: {
-    width: 47,
-    height: 47,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderRadius: 40,
-  },
-  avatarInner: {
-    width: '100%',
-    height: '100%',
-    borderRadius: 40,
-  },
   avatar: {
-    width: 47,
-    height: 47,
-    justifyContent: 'center',
-    alignItems: 'center',
-    width: '100%',
-    height: '100%',
+    width: 53,
+    height: 53,
     borderRadius: 40,
   },
   usernameButton: {
@@ -85,17 +86,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 10,
     paddingVertical: 8,
     paddingHorizontal: 10,
-    borderRadius: 20, 
-  },
-  addIcon: {
-    width: 20,
-    height: 20,
-  },
-  addText: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#2D2D2D',
-    marginLeft: 5,
+    borderRadius: 20,
   },
 });
 

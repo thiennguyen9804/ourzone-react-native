@@ -8,8 +8,8 @@ import UserMessageCard from '../../components/UserMessageCard';
 const MessageScreen = ({ navigation }) => {
 
     const friends = [
-        { id: '1', username: 'Nguyễn Văn A', chat:'kakakaka'},
-        { id: '2', username: 'Trần Văn B', chat:'jhuhuhuh'},
+        { id: '1', username: 'John Doe', avatar: 'https://via.placeholder.com/150' },
+        { id: '2', username: 'Jane Smith', avatar: 'https://via.placeholder.com/150' }
     ];
     
     const renderHeader = () => (
@@ -23,7 +23,7 @@ const MessageScreen = ({ navigation }) => {
     );
 
     const renderItem = ({ item }) => (
-        <UserMessageCard username={item.username} chat={item.chat} navigation={navigation} />
+        <UserMessageCard username={item.username} chat={item.chat} navigation={navigation} avatar={item.avatar} />
     );
 
     return (
