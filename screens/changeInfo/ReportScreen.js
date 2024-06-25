@@ -1,54 +1,101 @@
 import React, { useState } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, Image, Touchable } from 'react-native';
-import Animated, { SlideInDown, SlideInUp, SlideOutDown, SlideOutUp } from "react-native-reanimated";
+import { StyleSheet, View, Text, TouchableOpacity, TextInput, Alert } from 'react-native';
+import Animated from "react-native-reanimated";
 import { SvgXml } from 'react-native-svg';
-import { TextInput } from 'react-native-gesture-handler';
-//icon
+import * as MailComposer from 'expo-mail-composer';
+import * as Mailer from 'react-native-mail';
+
+
 import iconBack from "../../assets/back-icon";
 
 const ReportScreen = ({ navigation }) => {
     const [yourEmail, setYourEmail] = useState('');
     const [report, setReport] = useState('');
 
+    const handleReport = () => {
+        if (!yourEmail || !report.trim()) {
+            Alert.alert('Error', 'Please fill in both email and content fields.');
+            return;
+        }
+
+        // MailComposer.composeAsync({
+        //     recipients: ['ourzone.company@gmail.com'],
+        //     subject: 'Report a problem',
+        //     body: `Email: ${yourEmail}\n\nContent:\n${report}`,
+        // }).then(result => {
+        //     if (result.status === 'sent') {
+        Alert.alert('Report sent', 'Thanks for your report');
+        setYourEmail('');
+        setReport('');
+        //     } else {
+        //         Alert.alert('Error', 'Failed to send email.');
+        //     }
+        // }).catch(e => {
+        //     console.error('Error sending report: ', e);
+        //     Alert.alert('Error', 'Failed to send report. Please try again later.');
+        // });
+    };
+
+    // const handleReport = () => {
+    //     if (!yourEmail || !report) {
+    //         Alert.alert('Error', 'Please fill in both email and content fields.');
+    //         return;
+    //     }
+
+    //     Mailer.mail({
+    //         subject: 'Report a problem',
+    //         recipients: ['ourzone.company@gmail.com'],
+    //         body: `Email: ${yourEmail}\n\nContent:\n${report}`,
+    //         isHTML: false, // Có thể đặt là true nếu bạn muốn gửi HTML
+    //     }, (error, event) => {
+    //         if (error) {
+    //             console.error('Could not send mail. Please try again later.', error);
+    //             Alert.alert('Error', 'Failed to send report. Please try again later.');
+    //         } else {
+    //             Alert.alert('Report sent', 'Thanks for your report');
+    //             setYourEmail('');
+    //             setReport('');
+    //         }
+    //     });
+    // };
+
     return (
         <Animated.View
             style={styles.container}
-            entering={SlideInDown}
-            exiting={SlideOutDown}
         >
-            <TouchableOpacity style={styles.btnBack} >
-                <SvgXml style={styles.icon} xml={iconBack}
-                    onPress={() => navigation.navigate('Account')} />
+            <TouchableOpacity style={styles.btnBack} onPress={() => navigation.navigate('Account')}>
+                <SvgXml style={styles.icon} xml={iconBack} />
             </TouchableOpacity>
 
             <View style={styles.frmTopic}>
                 <Text style={styles.textTopic}>Report A Problem</Text>
             </View>
 
-            <TextInput style={styles.frmEditEmail}
-                onChange={setYourEmail}
+            <TextInput
+                style={styles.frmEditEmail}
+                onChangeText={text => setYourEmail(text)}
                 placeholder='Your email address'
-                value={yourEmail}></TextInput>
+                value={yourEmail}
+            />
 
-            <TextInput style={styles.frmEditReport}
-                onChange={setReport}
+            <TextInput
+                style={styles.frmEditReport}
+                onChangeText={text => setReport(text)}
                 placeholder="Tell us about what's going on..."
                 value={report}
-                multiline={true}></TextInput>
+                multiline={true}
+            />
 
-
-            <TouchableOpacity style={styles.btnSave}>
+            <TouchableOpacity style={styles.btnSave} onPress={handleReport}>
                 <Text style={styles.textInBtn}>Report</Text>
             </TouchableOpacity>
 
         </Animated.View>
-
     );
 };
 
 const styles = StyleSheet.create({
     container: {
-        display: 'flex',
         flex: 1,
         paddingHorizontal: 10,
         backgroundColor: '#F8FFF8',
@@ -59,42 +106,40 @@ const styles = StyleSheet.create({
         height: 50,
         position: 'absolute',
         top: 103,
-        verticalAlign: 10,
+        zIndex: 1000,
         backgroundColor: 'transparent'
     },
 
     icon: {
-        margin: "auto"
+        margin: 'auto'
     },
 
     frmTopic: {
-        alignContent: "center",
-        marginHorizontal: "auto",
-        marginVertical: 150,
+        alignSelf: 'center',
+        marginTop: 150,
         marginBottom: 25
     },
 
     textTopic: {
-        fontWeight: "800",
-        color: "#738F81",
+        fontWeight: '800',
+        color: '#738F81',
         letterSpacing: 0.5,
         fontSize: 26,
-        textShadowColor: 'rgba(0, 0, 0, 0.25)', // Shadow color
-        textShadowOffset: { width: 4, height: 4 }, // Offset for the shadow
-        textShadowRadius: 10, // Radius of the shadow blur
+        textShadowColor: 'rgba(0, 0, 0, 0.25)',
+        textShadowOffset: { width: 4, height: 4 },
+        textShadowRadius: 10,
     },
 
     frmEditEmail: {
         width: '90%',
         height: 50,
-        marginHorizontal: "auto",
-        borderColor: "#626262",
+        marginHorizontal: 'auto',
+        borderColor: '#626262',
         borderRadius: 50,
         borderWidth: 0.6,
-        paddingStart: 20,
+        paddingLeft: 20,
         fontSize: 12,
-        fontWeight: "400",
-        color: "#626262",
+        color: '#626262',
         letterSpacing: 3,
         marginBottom: 10
     },
@@ -102,34 +147,33 @@ const styles = StyleSheet.create({
     frmEditReport: {
         width: '90%',
         height: 241,
-        marginHorizontal: "auto",
-        borderColor: "#626262",
+        marginHorizontal: 'auto',
+        borderColor: '#626262',
         borderRadius: 21,
         borderWidth: 0.6,
         padding: 20,
         fontSize: 12,
-        fontWeight: "400",
-        color: "#626262",
+        color: '#626262',
         letterSpacing: 3,
-        textAlignVertical: "top",
+        textAlignVertical: 'top',
     },
 
     btnSave: {
         width: 118,
         height: 48,
         borderRadius: 50,
-        backgroundColor: "#738F81",
-        marginHorizontal: "auto",
+        backgroundColor: '#738F81',
+        marginHorizontal: 'auto',
         marginTop: 30,
-        alignItems: "center",
+        alignItems: 'center',
     },
 
     textInBtn: {
         fontSize: 16,
-        fontWeight: "800",
-        color: "#FFFFFF",
+        fontWeight: '800',
+        color: '#FFFFFF',
         letterSpacing: 3,
-        marginVertical: "auto"
+        marginVertical: 'auto'
     }
 });
 
