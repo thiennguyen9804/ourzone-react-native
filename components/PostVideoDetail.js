@@ -1,19 +1,19 @@
-import { Image, StyleSheet, View, Text, useWindowDimensions } from 'react-native';
+import { Image, StyleSheet, View, Text, useWindowDimensions, TextInput } from 'react-native';
 import { Video, ResizeMode } from 'expo-av';
 import { useRef, useEffect } from 'react';
 
 import { formatDistanceStrict } from 'date-fns';
 
-export default function PostVideoDetail({ id, uri, userAvatar, postActiveId }) {
+export default function PostVideoDetail({ currentPost, currentUser }) {
 	const videoRef = useRef();
-	useEffect(() => {
-		if(postActiveId !== id) {
-			videoRef.current.pauseAsync();
-		} 
-		if(postActiveId === id) {
-			videoRef.current.playAsync();
-		}
-	}, [postActiveId, videoRef])
+	// useEffect(() => {
+	// 	if(postActiveId !== id) {
+	// 		videoRef.current.pauseAsync();
+	// 	} 
+	// 	if(postActiveId === id) {
+	// 		videoRef.current.playAsync();
+	// 	}
+	// }, [postActiveId, videoRef])
 	const { height } = useWindowDimensions();
 
 	return (
@@ -24,10 +24,14 @@ export default function PostVideoDetail({ id, uri, userAvatar, postActiveId }) {
 					<Video
 						ref={videoRef}
 						style={styles.image}
-						source={require('../assets/Kiana Video.mp4')}
+						source={{uri: currentPost.image}}
 						isLooping
 						resizeMode={ResizeMode.COVER}
+						shouldPlay
 					/>
+					{currentPost.content && <View style={{width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center'}}>
+						<TextInput multiline textAlign='center' style={styles.messageInput} editable={false} value={currentPost.content}/>
+					</View>}
 				</View>
 			</View>
 
@@ -36,12 +40,12 @@ export default function PostVideoDetail({ id, uri, userAvatar, postActiveId }) {
 				{/* avatar */}
 				<View style={styles.avatarContainer}>
 					<View style={styles.innerImageContainer}>
-						<Image style={styles.image} resizeMode='cover' source={require('../assets/Kiana Avatar.jpg')}/>
+						<Image style={styles.image} resizeMode='cover' source={{uri: currentUser.avatar}}/>
 					</View>
 				</View>
 
 				{/* name */}
-				<Text style={styles.userName}>Kiana</Text>
+				<Text style={styles.userName}>{`${currentUser.userName || ''}`}</Text>
 
 				{/* time */}
 				{/* <Text style={styles.timeTxt}>{formatDistanceStrict(new Date('2024-05-30'), new Date())}</Text>	 */}
@@ -110,5 +114,16 @@ const styles = StyleSheet.create({
 		fontWeight: 'bold',
 		fontSize: 12,
 
-	}
+	},
+	messageInput: {
+		borderRadius: 18,
+		fontWeight: 'bold',
+		backgroundColor: '#fff',
+		letterSpacing: 1.2,
+		borderWidth: 5,
+		borderColor: '#fff',
+		paddingHorizontal: 10,
+		paddingVertical: 3,
+		fontSize: 16,
+	},
 })

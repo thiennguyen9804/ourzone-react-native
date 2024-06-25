@@ -17,6 +17,7 @@ import friendArrowIcon from "../assets/friend-arrow-icon";
 import chatIcon from "../assets/chat-icon";
 import gridIcon from "../assets/grid-icon";
 import shareIcon from "../assets/share-icon"
+import PostItemDetail from "../components/PostItemDetail";
 
 
 const HistoryScreen = ({ navigation }) => {
@@ -30,24 +31,24 @@ const HistoryScreen = ({ navigation }) => {
 	const toggleIsGrid = () => {
 		setIsGrid(curr => !curr);
 	}
-	// const viewabilityConfigCallbackPairs = useRef([
-	// 	{
-	// 		viewabilityConfig: { itemVisiblePercentThreshold: 100 },
-	// 		onViewableItemsChanged: ({changed, viewableItems}) => {
-	// 			if(viewableItems.length > 0 && viewableItems[0].isViewable) {
-	// 				setPostActiveId(viewableItems[0].item.id);
-	// 				setPostActiveIndex(viewableItems[0].index)
-	// 			}
-	// 		}
-	// 	}
-	// ]);
+	const viewabilityConfigCallbackPairs = useRef([
+		{
+			viewabilityConfig: { itemVisiblePercentThreshold: 100 },
+			onViewableItemsChanged: ({changed, viewableItems}) => {
+				if(viewableItems.length > 0 && viewableItems[0].isViewable) {
+					console.log(viewableItems[0].item);
+					setPostActiveId(viewableItems[0].item);
+					setPostActiveIndex(viewableItems[0].index)
+				}
+			}
+		}
+	]);
 
 	const pressHandler = (index) => {
 		// toggleIsGrid();
 		// linearListRef.current.scrollToIndex({index: index, animated: false});
-		console.log(index);
+		// console.log(index);
 	}
-
 
 	return (
 		<Animated.View
@@ -78,22 +79,17 @@ const HistoryScreen = ({ navigation }) => {
 				ref={linearListRef}
 				style={[styles.list, (isGrid && {display: 'none'})]}
 				data={postIds}
-				renderItem={({item}) => (
-					(item.type === 'image' || !item.type) ? (
-						<PostImageDetail postId={item} postActiveId={postActiveId}/>
-					) : (
-						<PostVideoDetail postId={item} postActiveId={postActiveId}/>
-					)
-				)}
+				renderItem={({item}) => (<PostItemDetail postId={item} postActiveId={postActiveId}/>)}
 				numColumns={1}
 				showsVerticalScrollIndicator={false}
 				showsHorizontalScrollIndicator={false}
 				pagingEnabled
 				keyExtractor={(item, index) => (`${item} ${index} ${isGrid}`)}
+				viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
 			/>
 
 			{/* for grid layout */}
-			<FlatList
+			{/* <FlatList
 				style={[styles.list, {marginTop: 140}, (!isGrid && {display: 'none'})]}
 				data={postIds}
 				renderItem={({ item, index }) => (
@@ -112,7 +108,7 @@ const HistoryScreen = ({ navigation }) => {
 				showsVerticalScrollIndicator={false}
 				showsHorizontalScrollIndicator={false}
 				keyExtractor={(item, index) => (`${item} ${index} ${isGrid}`)}
-			/>
+			/> */}
 			
 			{/* footer buttons */}
 			<View style={styles.footerSection}>
