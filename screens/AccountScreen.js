@@ -3,11 +3,13 @@ import { StyleSheet, View, Linking, Share, Text, TouchableOpacity, Image, Alert,
 import Animated, { SlideInDown, SlideOutDown, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { doc, getDoc } from 'firebase/firestore';
-import { auth, db } from '../firebase';
+import { doc, getDoc, updateDoc, getFirestore } from 'firebase/firestore';
+import { auth, db, storage } from '../firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApplicationContext } from '../hooks/useApplicationContext';
 import { useIsFocused } from '@react-navigation/native';
+import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import * as ImagePicker from 'expo-image-picker';
 
 // Icons
 import iconBack from "../assets/back-icon";
@@ -164,6 +166,51 @@ const AccountScreen = ({ navigation }) => {
 
     // };
 
+    const openImagePicker = async () => {
+        const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+        if (status !== 'granted') {
+            Alert.alert('Sorry, we need camera roll permissions to make this work!');
+            return;
+        }
+
+        let result = await ImagePicker.launchImageLibraryAsync({
+            mediaTypes: ImagePicker.MediaTypeOptions.Images,
+            allowsEditing: true,
+            aspect: [3, 3],
+            quality: 1,
+        });
+
+        if (!result.canceled) {
+            uploadImageToFirebase(result.uri);
+        }
+    };
+
+    const uploadImageToFirebase = async (uri) => {
+        try {
+            const response = await fetch(uri);
+            const blob = await response.blob();
+            const storageRef = ref(storage, `avatar/${auth.currentUser.uid}`);
+            await uploadBytes(storageRef, blob);
+            const downloadURL = await getDownloadURL(storageRef);
+            updateUserAvatar(downloadURL);
+        } catch (error) {
+            console.error("Error uploading image: ", error);
+            Alert.alert("Upload Error", "Failed to upload image. Please try again.");
+        }
+    };
+
+    const updateUserAvatar = async (url) => {
+        try {
+            const userDocRef = doc(db, 'user', auth.currentUser.uid);
+            await updateDoc(userDocRef, { avatar: url });
+            setSelectedImage({ uri: url });
+            fetchUserData(auth.currentUser);
+        } catch (error) {
+            console.error("Error updating user avatar: ", error);
+            Alert.alert("Update Error", "Failed to update user avatar. Please try again.");
+        }
+    };
+
     const handleSignOut = async () => {
         try {
             await auth.signOut();
@@ -264,7 +311,7 @@ const AccountScreen = ({ navigation }) => {
                 <View style={styles.bgAvatar}>
                     <Image style={styles.imgAvatar} source={selectedImage} />
                 </View>
-                <TouchableOpacity style={styles.btnChangeAvatar}>
+                <TouchableOpacity style={styles.btnChangeAvatar} onPress={openImagePicker}>
                     <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
                 </TouchableOpacity>
 
