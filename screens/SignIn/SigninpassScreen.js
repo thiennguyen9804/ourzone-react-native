@@ -15,56 +15,49 @@ const SigninpassScreen = ({ navigation, route }) => {
   const { email, password, setPassword, setUser, setUserId } = useApplicationContext();
   const [isSecureEntry, setIsSecureEntry] = useState(true);
   const [isLogged, setIsLogged] = useState(false);
-  // const auth = getAuth(); 
+  const auth = getAuth(); 
 
   const loginWithEmailHandler = async (email, password) => {
-    try { 
+    try {
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const user = userCredential.user;
-      setUserId(user.uid);
-      // console.log('user.uid');
-      setUser(prev => ({...prev, userId}));
-  
+      const userId = user.uid; // Ensure userId is defined correctly
+      setUserId(userId);
   
       await AsyncStorage.setItem('userId', userId);
-      const userDocRef = doc(db, 'user', userId); 
+      const userDocRef = doc(db, 'user', userId);
       const userDocSnapshot = await getDoc(userDocRef);
   
       if (userDocSnapshot.exists()) {
-  
         const userDataFromFirestore = userDocSnapshot.data();
-        const firstName = userDataFromFirestore.firstName;
-        const lastName = userDataFromFirestore.lastName;
-        const avatar =userDataFromFirestore.avatar;
-        setUser(prev => ({...prev, ...userDataFromFirestore}));
-       
-        await AsyncStorage.setItem('userId', userId);
+        const { firstName, lastName, avatar } = userDataFromFirestore;
+        setUser(prev => ({ ...prev, ...userDataFromFirestore, userId }));
   
-        
         const userData = {
           email: user.email,
           uid: userId,
-          firstName: firstName,
-          lastName: lastName,
-          avatar: avatar,
-          isLogged: true
+          firstName,
+          lastName,
+          avatar,
+          isLogged: true,
         };
-      await AsyncStorage.setItem('userData', JSON.stringify(userData));
-
-     
-      setIsLogged(true);
-
-      console.log('Logged in successfully:', user);
-      navigation.navigate('Camera'); 
-    }
-   } catch (error) {
+        await AsyncStorage.setItem('userData', JSON.stringify(userData));
+  
+        setIsLogged(true);
+  
+        console.log('Logged in successfully:', user);
+        navigation.navigate('Camera');
+      } else {
+        console.error('No user data found in Firestore');
+        Alert.alert('Error', 'User data not found. Please try again.');
+      }
+    } catch (error) {
       const errorCode = error.code;
       const errorMessage = error.message;
       console.error('Error logging in:', errorCode, errorMessage);
-      Alert.alert('Error', 'Email or Password was not corectt. Please try again.');
+      Alert.alert('Error', 'Email or Password was not correct. Please try again.');
     }
   };
-
   const handleLogin = () => {
     if (!email || !password) {
       Alert.alert('Error', 'Email or password cannot be empty.');

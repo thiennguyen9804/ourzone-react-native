@@ -3,10 +3,7 @@ import { Text, View, StyleSheet, ImageBackground, SafeAreaView, StatusBar, Touch
 import { SvgXml } from 'react-native-svg';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import leaficon from '../assets/leaf-icon';
-import { useApplicationContext } from '../hooks/useApplicationContext';
 const sourcebr = require('../assets/image.png');
-import { auth } from '../firebase'
-import { useNavigation } from '@react-navigation/native';
 
 const StartScreen = ({ navigation }) => {
   // useEffect(() => {
@@ -80,7 +77,7 @@ const styles = StyleSheet.create({
     fontFamily:'OpenSansBold',
   },
   btnsignin: {
-    // Add any necessary styles for the Sign In button
+    
   }
 });
 

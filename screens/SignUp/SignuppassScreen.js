@@ -9,20 +9,7 @@ const SignuppassScreen = ({ navigation, route }) => {
   const [password, setPassword] = React.useState('');
   const [isSecureEntry, setIsSecureEntry] = useState(true);
   const { email } = route.params;
-  const checkPass = async () => {
-    try {
-      if (!password) {
-        Alert.alert('Error', 'Password cannot be empty.');
-        return;
-      }
-     else {
-      navigation.navigate('SignupName',  { email, password })
-      }
-    } catch (error) {
-      // console.error('Error checking email:', error);
-      // Alert.alert('Error', 'Failed to check email. Please try again.');
-    }
-  };
+  
   return (
     <ImageBackground style={styles.background}>
       <StatusBar barStyle="dark-content" />
@@ -50,7 +37,7 @@ const SignuppassScreen = ({ navigation, route }) => {
         <Text style={{ color: '#738F81', fontFamily: 'OpenSansBold' }}> 8 characters</Text>
       </Text>
     </View>
-        <TouchableOpacity style={styles.btnContinue} onPress={checkPass}>
+        <TouchableOpacity style={styles.btnContinue} onPress={() => navigation.navigate('SignupName',  { email, password })}>
           <Text style={styles.text}>Continue</Text>
         </TouchableOpacity>
         
