@@ -22,12 +22,13 @@ export const usePost = () => {
 		return Promise.resolve(res);
 	}	
 
-	const createPost = async (content, image, userId) => {
+	const createPost = async (content, image, userId, type) => {
 		const newPost = {
 			content,
 			createdAt: Timestamp.fromMillis(Date.now()),
 			image,
-			userId
+			userId,
+			type
 		};
 
 		const newPostRef = await addDoc(collection(db, 'post'), newPost);

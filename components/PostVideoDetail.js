@@ -125,5 +125,6 @@ const styles = StyleSheet.create({
 		paddingHorizontal: 10,
 		paddingVertical: 3,
 		fontSize: 16,
+		opacity: 10
 	},
 })

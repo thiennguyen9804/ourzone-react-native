@@ -29,7 +29,8 @@ import ChangeThemeScreen from './screens/changeInfo/ChangeThemeScreen';
 import ReportScreen from './screens/changeInfo/ReportScreen';
 import ChangeNameScreen from './screens/changeInfo/ChangeNameScreen';
 import FriendScreen from './screens/FriendScreen';
-
+import MessageScreen from './screens/Message/MessageScreen';
+import MessageBoxScreen from './screens/Message/MessageBoxScreen';
 
 // const clearUserData = async () => {
 //   try {
@@ -125,6 +126,9 @@ export default function App () {
               <Stack.Screen name="Report" component={ReportScreen} />
               <Stack.Screen name="ChangeName" component={ChangeNameScreen} />
               <Stack.Screen name="Friend" component={FriendScreen} />
+              <Stack.Screen name="Message" component={MessageScreen}/>
+        <Stack.Screen name="MessageBox" component={MessageBoxScreen}/>
+
             </Stack.Navigator>
           </GestureHandlerRootView>
       </ApplicationContext>

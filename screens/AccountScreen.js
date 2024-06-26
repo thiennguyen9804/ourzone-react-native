@@ -1,14 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { StyleSheet, View, Linking, Share, Text, TouchableOpacity, Image, Alert, ScrollView, ToastAndroid } from 'react-native';
-import Animated, { SlideInDown, SlideOutDown, SlideInRight, SlideOutLeft } from 'react-native-reanimated';
+import Animated, { SlideInDown, SlideOutDown, SlideInRight, SlideOutLeft, SlideInLeft, SlideOutRight } from 'react-native-reanimated';
 import { SvgXml } from 'react-native-svg';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { doc, getDoc, updateDoc, getFirestore } from 'firebase/firestore';
-import { auth, db, storage } from '../firebase';
+import { auth, db } from '../firebase';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useApplicationContext } from '../hooks/useApplicationContext';
 import { useIsFocused } from '@react-navigation/native';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { getStorage, ref, uploadBytes, getDownloadURL, uploadBytesResumable } from 'firebase/storage';
 import * as ImagePicker from 'expo-image-picker';
 
 // Icons
@@ -32,98 +32,15 @@ import iconPP from "../assets/pp-icon";
 import iconManager from "../assets/manage-icon";
 import iconSignOut from "../assets/sign-out-icon";
 import iconDeleteAcc from "../assets/delete-acc-icon";
-
-
+import { useUser } from '../hooks/useUser';
 
 const AccountScreen = ({ navigation }) => {
-    const { user } = useApplicationContext();
-    const [userData, setUserData] = useState(null);
-    const [selectedImage, setSelectedImage] = useState(null);
-    const [uploading, setUploading] = useState(false);
-    const isFocused = useIsFocused();
+    const { user, setUser } = useApplicationContext();
+    const { updateUserByUserId } = useUser();
+    const storage = getStorage();
+    // const [userData, setUserData] = useState(null);
 
-    useEffect(() => {
-        const fetchUserData = async (uid) => {
-            try {
-                const userDataJSON = await AsyncStorage.getItem('userData');
-                if (userDataJSON) {
-                    const userData = JSON.parse(userDataJSON);
-                    const userDoc = await getDoc(doc(db, 'user', userData.uid));
-                    console.log("User data from database:", userData);
-                    setUserData(userData);
-                } else {
-                    Alert.alert("Error", "No user data found in AsyncStorage");
-                }
-            } catch (error) {
-                console.error("Error fetching user data: ", error);
-                Alert.alert("Error", "Failed to fetch user data. Please try again.");
-            }
-        }
-        const unsubscribe = onAuthStateChanged(auth, async (user) => {
-            if (user) {
-                try {
-                    const userDataFromStorage = await AsyncStorage.getItem('userData');
-                    if (userDataFromStorage) {
-                        const parsedUserData = JSON.parse(userDataFromStorage);
-                        fetchUserData(parsedUserData.userData);
-                    } else {
-                        // Alert.alert("Error", "No user data found in AsyncStorage");
-                    }
-                } catch (error) {
-                    console.error("Error fetching user data from AsyncStorage: ", error);
-                    Alert.alert("Error", "Failed to fetch user data from AsyncStorage. Please try again.");
-                }
-            } else {
-                setUserData(null);
-            }
-        });
-    });
-
-    const fetchUserData = async (user) => {
-        try {
-            const userDoc = await getDoc(doc(db, 'user', user.uid));
-            if (userDoc.exists()) {
-                setUserData(userDoc.data());
-                setSelectedImage({ uri: userDoc.data().avatar });
-            } else {
-                Alert.alert("Error", "No user data found");
-            }
-        } catch (error) {
-            console.error("Error fetching user data: ", error);
-            Alert.alert("Error", "Failed to fetch user data. Please try again.");
-        }
-    };
-
-
-    useEffect(() => {
-        const unsubscribe = onAuthStateChanged(auth, (user) => {
-            if (user) {
-                fetchUserData(user);
-            } else {
-                navigation.navigate('Start');
-            }
-        });
-
-        return () => unsubscribe();
-    }, [navigation]);
-
-
-
-    useEffect(() => {
-        if (isFocused) {
-            const user = auth.currentUser;
-            if (user) {
-                fetchUserData(user);
-            }
-        }
-    }, [isFocused]);
-
-    if (!userData) {
-        return null;
-    }
-
-    const { firstName, lastName } = userData;
-    const fullName = `${firstName} ${lastName}`;
+    // console.log(user);
 
     // const selectImage = async () => {
     //     try {
@@ -185,17 +102,21 @@ const AccountScreen = ({ navigation }) => {
             setSelectedImage(imageUri);
 
             uploadImageToFirebase(result.assets[0]);
+            console.log('result uri', result.assets[0].uri);
+            uploadImageToFirebase(result.assets[0].uri);
         }
     };
 
     const uploadImageToFirebase = async (uri) => {
         try {
             const response = await fetch(uri);
-            const blob = await response.blob();
-            const storageRef = ref(storage, `avatar/${auth.currentUser.uid}`);
-            await uploadBytes(storageRef, blob);
-            const downloadURL = await getDownloadURL(storageRef);
-            updateUserAvatar(downloadURL);
+            const theBlob = await response.blob();
+            const imageRef = ref(storage, `${user.userId}/${Date.now()}`);
+            const uploadTask = await uploadBytesResumable(imageRef, theBlob);
+            const downloadUri = await getDownloadURL(imageRef);
+            updateUserByUserId(user.userId, {
+                avatar: downloadUri
+            }, setUser);
         } catch (error) {
             console.error("Error uploading image: ", error);
             Alert.alert("Upload Error", "Failed to upload image. Please try again.");
@@ -216,8 +137,10 @@ const AccountScreen = ({ navigation }) => {
 
     const handleSignOut = async () => {
         try {
-            await auth.signOut();
-            console.log('User signed out successfully');
+            auth.signOut();
+            AsyncStorage.removeItem('userId');
+            // console.log('User signed out successfully');
+            ToastAndroid.show('Logout successfully', ToastAndroid.SHORT);
             navigation.navigate('Start')
         } catch (e) {
             console.error('Error signing out:', e);
@@ -301,8 +224,8 @@ const AccountScreen = ({ navigation }) => {
     return (
         <Animated.View
             style={styles.container}
-            entering={SlideInRight}
-            exiting={SlideOutLeft}
+            entering={SlideInLeft}
+            exiting={SlideOutRight}
         >
             <View>
                 <TouchableOpacity style={styles.btnBack} onPress={() => navigation.navigate('Camera')}>
@@ -312,14 +235,14 @@ const AccountScreen = ({ navigation }) => {
 
             <ScrollView style={styles.containerScrollView} >
                 <View style={styles.bgAvatar}>
-                    <Image style={styles.imgAvatar} source={selectedImage} />
+                    <Image style={styles.imgAvatar} source={{ uri: user.avatar }} />
                 </View>
                 <TouchableOpacity style={styles.btnChangeAvatar} onPress={openImagePicker}>
                     <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
                 </TouchableOpacity>
 
                 <View style={styles.frmName}>
-                    <Text style={styles.textName}>{fullName}</Text>
+                    <Text style={styles.textName}>{user.userName || `${user.firstName} ${user.lastName}`}</Text>
                 </View>
 
                 <TouchableOpacity style={styles.btnChangeName} onPress={() => navigation.navigate('ChangeName')}>
@@ -467,7 +390,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 10,
         backgroundColor: '#F8FFF8',
-        justifyContent: 'center'
+        justifyContent: 'center',
         // position: 'absolute'
     },
 

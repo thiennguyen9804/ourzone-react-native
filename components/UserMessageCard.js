@@ -2,20 +2,21 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-const UserMessageCard = ({ username, navigation, chat }) => {
+const UserMessageCard = ({ username, navigation, chat,avatar }) => {
   return (
     <View style={styles.container}>
         <TouchableOpacity style={styles.messButton} onPress={() => navigation.navigate('MessageBox')}>
             <View style={styles.avatarContainer}>
                 <View style={styles.avatarOuter}>
-                   <Image style={styles.avatar} source={require('../assets/avatar-picture.jpg') }/>
-                    </View>
+                <Image style={styles.avatar} source={{uri: avatar} }/>
+                </View>
             </View>
             <View style={{ marginLeft: 10, flex: 1 }}>
                 <Text style={styles.usernameText}>{username}</Text>
                 <Text style={styles.chatText}>{chat}</Text>
             </View>
       </TouchableOpacity>
+      
     </View>
   );
 };
@@ -75,7 +76,7 @@ const styles = StyleSheet.create({
   usernameText: {
     fontSize: 17,
     marginHorizontal: 10,
-    fontWeight: 'bold',
+    fontFamily:'OpenSansBold',
 
     color: '#738F81',
   },
@@ -97,18 +98,11 @@ const styles = StyleSheet.create({
     color: '#2D2D2D',
     marginLeft: 5,
   },
-  usernameText: {
-    fontSize: 17,
-    fontWeight: 'bold',
-    color: '#738F81',
-  },
+
   chatText: {
     fontSize: 12,
     color: '#A1A1A1',
-  },
-  chatText: {
-    fontSize: 12,
-    color: '#A1A1A1',
+    fontFamily:'OpenSans',
   },
 });
 
