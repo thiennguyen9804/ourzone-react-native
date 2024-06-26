@@ -24,7 +24,7 @@ export const useMessage = () => {
 
 
 		await updateDoc(doc(db, 'messageRoom', messageId), {
-			messages: arrayUnion({...value, createdAt: Date.now()})
+			messages: arrayUnion({...value, createdAt: new Date()})
 		});
 	}
 	return {getMessageByMessageId, addMessage}

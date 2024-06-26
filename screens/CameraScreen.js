@@ -184,13 +184,18 @@ const CameraScreen = ({ navigation }) => {
 				// pre cap
 				<>
 					{/* camera */}
-					{isFocused && <Camera
-						ref={cameraRef}
-						style={styles.camera}
-						type={facing}
-						flashMode={flashMode}
-						ratio='1:1'
-					/>}
+					<View style={styles.cameraContainer}>
+						<View style={styles.cameraInnerContainer}>
+							{isFocused && <Camera
+								ref={cameraRef}
+								style={styles.camera}
+								type={facing}
+								flashMode={flashMode}
+								ratio='1:1'
+							/>}
+						</View>
+					</View>
+					
 
 					<View style={styles.captureSection}>
 						{/* flash */}
@@ -276,24 +281,26 @@ const styles = StyleSheet.create({
 		display: 'flex',
 	},
 
-	cameraContainer: {
-		width: '100%',
-		aspectRatio: 1,
-		borderWidth: 4,
-		borderRadius: 40,
-		backgroundColor: '#AAC2B3',
-		borderColor: '#D0E2DE',
-		padding: 20
+	cameraInnerContainer: {
+		backgroundColor: 'red',
+		borderRadius: 30,
+		display: 'flex',
+		justifyContent: 'center',
+		alignItems: 'center',
+		overflow: 'hidden'
 	},
 
-	cameraOuter: {
-		borderRadius: 30
+	cameraContainer: {
+		marginTop: 40,
+		padding: 15,
+		borderRadius: 40,
+		backgroundColor: '#AAC2B3',
+
 	},
 
 	camera: {
 		width: '100%',
 		aspectRatio: 1,
-		marginTop: 40
 	},
 
 	navBtn: {
