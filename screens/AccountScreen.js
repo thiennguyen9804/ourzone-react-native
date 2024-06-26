@@ -98,6 +98,10 @@ const AccountScreen = ({ navigation }) => {
         });
 
         if (!result.canceled) {
+            const imageUri = result.assets[0]
+            setSelectedImage(imageUri);
+
+            uploadImageToFirebase(result.assets[0]);
             console.log('result uri', result.assets[0].uri);
             uploadImageToFirebase(result.assets[0].uri);
         }
@@ -231,7 +235,7 @@ const AccountScreen = ({ navigation }) => {
 
             <ScrollView style={styles.containerScrollView} >
                 <View style={styles.bgAvatar}>
-                    <Image style={styles.imgAvatar} source={{uri: user.avatar}} />
+                    <Image style={styles.imgAvatar} source={{ uri: user.avatar }} />
                 </View>
                 <TouchableOpacity style={styles.btnChangeAvatar} onPress={openImagePicker}>
                     <SvgXml style={styles.iconChangeAvatar} xml={iconChangeAvatar}></SvgXml>
