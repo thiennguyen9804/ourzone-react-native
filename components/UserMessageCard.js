@@ -2,13 +2,16 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 
-const UserMessageCard = ({ username, navigation, chat,avatar }) => {
+const UserMessageCard = ({ username, navigation, chat, avatar, userId, friendId }) => {
+  // console.log(avatar)
   return (
     <View style={styles.container}>
-        <TouchableOpacity style={styles.messButton} onPress={() => navigation.navigate('MessageBox')}>
+        <TouchableOpacity style={styles.messButton} onPress={() => navigation.navigate('MessageBox', {
+          friendId, userId, username, avatar
+        })}>
             <View style={styles.avatarContainer}>
                 <View style={styles.avatarOuter}>
-                <Image style={styles.avatar} source={{uri: avatar} }/>
+                  <Image style={styles.avatar} source={{uri: avatar} }/>
                 </View>
             </View>
             <View style={{ marginLeft: 10, flex: 1 }}>
@@ -16,7 +19,7 @@ const UserMessageCard = ({ username, navigation, chat,avatar }) => {
                 <Text style={styles.chatText}>{chat}</Text>
             </View>
       </TouchableOpacity>
-      
+
     </View>
   );
 };

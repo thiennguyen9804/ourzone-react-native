@@ -1,6 +1,6 @@
 import { createContext, useEffect, useLayoutEffect, useState } from "react"
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
+import { getFirestore, onSnapshot } from "firebase/firestore";
 import { collection, query, where, limit, getDocs, doc, getDoc } from "firebase/firestore";
 import { useUser } from "../hooks/useUser";
 import { usePost } from "../hooks/usePost";
@@ -32,6 +32,12 @@ export default function ApplicationContextProvider({ children }) {
 	const { getPostByPostId } = usePost();
 	const navigation  = useNavigation();
 	const [isLogged, setIsLogged] = useState(false);
+	const [chat, setChat] = useState(false);
+	const [otherUserIds, setOtherUserIds] = useState([]);
+	const [friendIds, setFriendIds] = useState([]);
+	const [friends, setFriends] = useState([]);
+	let messageLobby;
+	let messageRoomIds;
 
 	useEffect(() => {
 		ScreenOrientation.lockAsync(OrientationLock.PORTRAIT_UP);
@@ -44,9 +50,33 @@ export default function ApplicationContextProvider({ children }) {
 			try {
 				const userIdValue = await AsyncStorage.getItem('userId');
 				if(userIdValue) {
+					// get user
 					setUserId(userIdValue);
-					getUserByUserId(userIdValue, setUser);
+					const userValue = await getUserByUserId(userIdValue, setUser);
+					// get newsfeed and posts
 					getNewsfeedByUserId(userIdValue, setNewsfeed, setPostIds);
+					// get other users
+					const otherUserIdsValue = [...userValue.friends];
+					setOtherUserIds([...otherUserIdsValue]);
+					// get friend ids
+					const friendIdsValue = otherUserIdsValue.filter(elem => elem.split('_')[1] === 'friend').map(elem => elem.split('_')[0]);
+					setFriendIds(friendIdsValue);
+					// console.log(friendIdsValue)
+					// get friends
+					friendIdsValue.forEach(async id => {
+						let elem = await getUserByUserId(id);
+						if(elem)
+						// console.log(elem);
+							setFriends(prev => [...prev, elem]);
+					})
+					// get message lobby
+					const unsubscribeMessageLobby = onSnapshot(
+						query(collection(db, 'messageLobby'), where('userId', '==', userId), limit(1)),
+						(querySnapshot) => {
+							querySnapshot.forEach(doc => messageLobby = doc.data())
+						}
+					)
+					// console.log('friend', friendIdsValue)
 					navigation.navigate('Camera');
 				}
 			} catch(error) {
@@ -56,10 +86,10 @@ export default function ApplicationContextProvider({ children }) {
 	}, []);
 
 	// console.log('userId', userId);
-	console.log('user', user);
+	// console.log('user', user);
 	// console.log('auth current user', auth.currentUser.uid);
 	// console.log('auth current user', auth.currentUser);
-	console.log('newsfeed', newsfeed);
+	// console.log('newsfeed', newsfeed);
 	
 	return (
 		<ApplicationContext.Provider value={{
@@ -68,7 +98,11 @@ export default function ApplicationContextProvider({ children }) {
 			email, setEmail, 
 			user, setUser,
 			password, setPassword, 
-			userId, setUserId
+			userId, setUserId,
+			chat, setChat,
+			messageLobby,
+			friendIds, setFriendIds,
+			friends, setFriends
 		}}>
 			{children}
 		</ApplicationContext.Provider>

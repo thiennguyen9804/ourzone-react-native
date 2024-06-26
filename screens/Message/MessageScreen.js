@@ -4,13 +4,17 @@ import { SvgXml } from 'react-native-svg';
 import arrowMessIcon from '../../assets/arrow-mess-icon';  
 import messageGreenIcon from '../../assets/message-green-icon';  
 import UserMessageCard from '../../components/UserMessageCard';
+import { useApplicationContext } from '../../hooks/useApplicationContext';
 
 const MessageScreen = ({ navigation }) => {
 
-    const friends = [
-        { id: '1', username: 'John Doe', avatar: 'https://via.placeholder.com/150',chat:"trôii" },
-        { id: '2', username: 'Jane Smith', avatar: 'https://via.placeholder.com/150',chat:"ngủ i" }
-    ];
+    // const friends = [
+    //     { id: '1', username: 'John Doe', avatar: 'https://via.placeholder.com/150',chat:"trôii" },
+    //     { id: '2', username: 'Jane Smith', avatar: 'https://via.placeholder.com/150',chat:"ngủ i" }
+    // ];
+    const { friends } = useApplicationContext();
+    // console.log('friends in chat', friends)
+    const { user } = useApplicationContext();
     
     const renderHeader = () => (
         <View style={styles.headerContainer}>
@@ -22,9 +26,20 @@ const MessageScreen = ({ navigation }) => {
         </View>
     );
 
-    const renderItem = ({ item }) => (
-        <UserMessageCard username={item.username} chat={item.chat} navigation={navigation} avatar={item.avatar} />
-    );
+    const renderItem = ({ item }) => {
+        console.log(item.userName);
+        console.log(item.avatar)
+        return (
+            <UserMessageCard 
+                username={item.userName} 
+                chat={'hello'} 
+                navigation={navigation}
+                avatar={item.avatar} 
+                userId={user.userId}
+                friendId={item.userId}
+            />
+        )
+    };
 
     return (
         <FlatList
@@ -32,7 +47,7 @@ const MessageScreen = ({ navigation }) => {
             style={styles.scrollView}
             data={friends} 
             renderItem={renderItem}  
-            keyExtractor={(item) => item.id}
+            keyExtractor={(item) => item.userId}
             ItemSeparatorComponent={() => <View style={styles.separator} />} 
             ListEmptyComponent={() => (
                 <View style={styles.emptyContainer}>
@@ -65,10 +80,13 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         alignItems: 'center',
         padding: 20,
+        // backgroundColor: 'red',
+        margin: 'auto'
     },
     emptyText: {
         fontSize: 18,
         color: '#777',
+        justifyContent: 'center',
     },
     backIcon: {
         padding: 10,
@@ -78,7 +96,7 @@ const styles = StyleSheet.create({
         marginLeft: 50,
     },
     separator: {
-        height: 20, 
+        height: 20
     },
 });
 

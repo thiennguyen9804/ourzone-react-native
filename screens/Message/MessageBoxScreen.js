@@ -1,18 +1,70 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import arrowMessIcon from '../../assets/arrow-mess-icon';  
 import cameraIcon from '../../assets/camera-icon';
 import fireIcon from '../../assets/fire-icon';
+import { collection, limit, onSnapshot, or, query, where, getDocs } from 'firebase/firestore';
+import { app, db } from '../../firebase';
+import { useMessage } from '../../hooks/useMessage';
 
-const MessageBoxScreen = ({ navigation }) => {
-    const messages = [
-        { id: '1', text: 'Mày làm gì đóa?', isSent: true },
-        { id: '2', text: 'Tao code', isSent: false },
-        { id: '3', text: 'Sao t lại đi đăng kí mấy quỷ này ta', isSent: false },
-        { id: '4', text: 'Ngủ u', isSent: true },
-        { id: '5', text: 'Chưa xong tròi oi', isSent: false },
-    ];
+const MessageBoxScreen = ({ route, navigation }) => {
+    // isSent = true: on the right
+    // isSent = false: on the left
+    const { friendId, userId, username, avatar } = route.params;
+    // console.log(friendId, userId);
+    const { getMessageByMessageId } = useMessage();
+    // let messages = [
+    //     // { id: '1', text: 'Mày làm gì đóa?', isSent: true },
+    //     // { id: '2', text: 'Tao code', isSent: false },
+    //     // { id: '3', text: 'Sao t lại đi đăng kí mấy quỷ này ta', isSent: false },
+    //     // { id: '4', text: 'Ngủ u', isSent: true },
+    //     // { id: '5', text: 'Chưa xong tròi oi', isSent: false },
+    // ];
+
+    // let currentMessageRoom = {}
+    const [messages, setMessages] = useState([]);
+    const [currentMessageRoom, setCurrentMessageRoom] = useState({});
+    const [loadingMessageRoom , setLoadingMessageRoom] = useState(true);
+
+    // useEffect(() => {
+    //     (async () => {
+    //         const q = query(collection(db, 'messageRoom'), or(
+    //             where('users', '==', [userId, friendId], limit(1)),
+    //             where('users', '==', [friendId, userId], limit(1))
+    //         ));
+    //         const querySnapshot = await getDocs(q);
+    //         querySnapshot.forEach(doc => setCurrentMessageRoom(doc.data()));
+    //         console.log('currentMessageRoom', currentMessageRoom)
+    //         currentMessageRoom.messages.forEach(async id => {
+    //             let messageValue = await getMessageByMessageId(id);
+    //             messageValue.isSent = userId === messageValue.userId
+    //             // messages.push(messageValue);
+    //             setMessages(prev => [...prev, messageValue]);
+    //         })
+    //     })();
+    // }, []);
+
+    useEffect(() => {
+        const q = query(collection(db, 'messageRoom'), or(
+            where('users', '==', [userId, friendId], limit(1)),
+            where('users', '==', [friendId, userId], limit(1))
+        ));
+        const unsub = onSnapshot(q, snapshot => {
+            let value = {} 
+            snapshot.forEach(doc => {
+                console.log(doc.data());
+                value = doc.data();
+            });
+            console.log(value)
+            setMessages(value.messages);
+            setCurrentMessageRoom(value);
+            setLoadingMessageRoom(true);
+        });
+
+        return () => unsub();
+    }, []);
+
 
     const renderHeader = () => (
         <View style={styles.headerContainer}>
@@ -21,14 +73,15 @@ const MessageBoxScreen = ({ navigation }) => {
             </TouchableOpacity>    
             <View style={styles.avatarContainer}>
                 <View style={styles.avatarOuter}>
-                    <Image style={styles.avatar} source={{ uri: 'https://via.placeholder.com/150' }} />
+                    <Image style={styles.avatar} source={{ uri: avatar }} />
                 </View>
-                <Text style={styles.usernameText}>name</Text>      
+                <Text style={styles.usernameText}>{username}</Text>      
             </View>
         </View>
     );
 
     const renderFooter = () => (
+
         <View style={styles.footerContainer}>
             <TouchableOpacity onPress={() => navigation.navigate('Camera')}>            
                 <SvgXml xml={cameraIcon} style={styles.icon}/>
@@ -44,11 +97,14 @@ const MessageBoxScreen = ({ navigation }) => {
         </View>
     );
 
-    const renderItem = ({ item }) => (
-        <View style={[styles.messageContainer, item.isSent ? styles.sentMessage : styles.receivedMessage]}>
-            <Text style={styles.messageText}>{item.text}</Text>
-        </View>
-    );
+    const renderItem = ({ item }) => {
+        console.log('item in render item', item);
+        return (
+            <View style={[styles.messageContainer, (item.sendUser === userId) ? styles.sentMessage : styles.receivedMessage]}>
+                <Text style={styles.messageText}>{item.content}</Text>
+            </View>
+        )
+    };
 
     return (
         <View style={styles.container}>
@@ -57,7 +113,7 @@ const MessageBoxScreen = ({ navigation }) => {
                 style={styles.scrollView}
                 data={messages}  
                 renderItem={renderItem}  
-                keyExtractor={(item) => item.id}
+                keyExtractor={(item, index) => `${item.sendUser} ${item.content} ${index}`}
                 ListEmptyComponent={() => (
                     <View style={styles.emptyContainer}>
                         <Text style={styles.emptyText}>No messages to display</Text>

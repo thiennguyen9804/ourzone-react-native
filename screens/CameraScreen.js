@@ -174,7 +174,7 @@ const CameraScreen = ({ navigation }) => {
 				</TouchableOpacity>
 
 				{/* chat nav */}
-				<TouchableOpacity style={styles.navBtn} onPress={()=>navigation.navigate('Message')}>
+				<TouchableOpacity style={styles.navBtn} onPress={() => navigation.navigate('Message')}>
 					<SvgXml xml={chatIcon} />
 				</TouchableOpacity>
 			</View>

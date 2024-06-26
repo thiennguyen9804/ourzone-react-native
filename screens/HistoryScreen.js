@@ -1,5 +1,5 @@
 // frameworks
-import { FlatList, StyleSheet, Text, View, TouchableOpacity } from "react-native";
+import { FlatList, StyleSheet, Text, View, TouchableOpacity, TouchableWithoutFeedback, Keyboard } from "react-native";
 import Animated, { SlideInDown, SlideInUp, SlideOutDown, SlideOutUp } from "react-native-reanimated";
 import { SvgXml } from "react-native-svg";
 import { useState, useRef, useEffect, useLayoutEffect } from "react";
@@ -20,9 +20,10 @@ import shareIcon from "../assets/share-icon"
 import PostItemDetail from "../components/PostItemDetail";
 import ReactionBar from "../widgets/ReactionBar";
 
+let globalChat = false;
 
 const HistoryScreen = ({ navigation }) => {
-	const { postIds, setPostIds, newsfeed } = useApplicationContext();
+	const { postIds, setPostIds, newsfeed, chat, setChat } = useApplicationContext();
 	const [isFriendsOpen, setIsFriendsOpen] = useState(false);
 	const [isGrid, setIsGrid] = useState(false);
 	const [postActiveId, setPostActiveId] = useState(postIds[0]);
@@ -51,7 +52,13 @@ const HistoryScreen = ({ navigation }) => {
 		// console.log(index);
 	}
 
+	const historyPress = () => {
+		setChat(prev => !prev);
+		Keyboard.dismiss();
+	}
+
 	return (
+
 		<Animated.View
 			style={styles.container}
 			entering={SlideInDown}
@@ -70,7 +77,7 @@ const HistoryScreen = ({ navigation }) => {
 				</TouchableOpacity>
 
 				{/* chat btn */}
-				<TouchableOpacity style={styles.chatBtn}>
+				<TouchableOpacity style={styles.chatBtn} onPress={() => navigation.navigate('Message')}>
 					<SvgXml xml={chatIcon} />
 				</TouchableOpacity>
 			</View>
@@ -138,6 +145,7 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'column',
 		flex: 1,
+		// opacity: (globalChat ? 0.8 : 1)
 		// position: 'absolute'
 	},
 
@@ -158,6 +166,8 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		bottom: 40,
+		left: 0,
+		right: 0,
 		justifyContent: 'space-evenly',
 		alignItems: 'center',
 		zIndex: 1,

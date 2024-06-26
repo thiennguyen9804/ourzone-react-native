@@ -127,7 +127,7 @@ export default function App () {
               <Stack.Screen name="ChangeName" component={ChangeNameScreen} />
               <Stack.Screen name="Friend" component={FriendScreen} />
               <Stack.Screen name="Message" component={MessageScreen}/>
-        <Stack.Screen name="MessageBox" component={MessageBoxScreen}/>
+              <Stack.Screen name="MessageBox" component={MessageBoxScreen}/>
 
             </Stack.Navigator>
           </GestureHandlerRootView>

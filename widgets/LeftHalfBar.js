@@ -3,26 +3,10 @@ import { TextInput, View, TouchableOpacity, StyleSheet, Text } from "react-nativ
 import { SvgXml } from "react-native-svg"
 import fireIcon from '../assets/fire-icon';
 
-const LeftHalfBar = () => {
-    const [chat, setChat] = useState(false); // false: hide the text input, true: display text input
-    const toggle = () => setChat(prev => !prev);
+const LeftHalfBar = ({chatToggle}) => {
 	return (
-        <TouchableOpacity style={styles.container} >
-            {chat && (
-                <>
-                    <TextInput
-                        style={styles.textInput}
-                        placeholder="Type a message..."
-                        placeholderTextColor="#fff"
-                    />
-                    <TouchableOpacity>            
-                        <SvgXml xml={fireIcon} style={styles.icon}/>
-                    </TouchableOpacity> 
-                </>)
-            }
-
+        <TouchableOpacity style={styles.container} onPress={chatToggle}>
             <Text style={styles.text}>Send message</Text>
-
         </TouchableOpacity>
 		
 	)
@@ -63,4 +47,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default forwardRef(LeftHalfBar);
+export default (LeftHalfBar);

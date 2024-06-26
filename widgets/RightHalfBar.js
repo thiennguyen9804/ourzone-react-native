@@ -12,7 +12,6 @@ import moreEmojiIcon from "../assets/more-emoji-icon"
 const RightHalfBar = () => {
 	const [emojiOpen, setEmojiOpen] = useState(false);
 	const pressHandler = () => {
-		
 	}
 	return (
 		<TouchableOpacity style={styles.container} onPress={pressHandler}>
@@ -41,4 +40,4 @@ const styles = StyleSheet.create({
     },
 })
 
-export default forwardRef(RightHalfBar)
+export default (RightHalfBar)
