@@ -32,7 +32,7 @@ export default function ApplicationContextProvider({ children }) {
 	const { getPostByPostId } = usePost();
 	const navigation  = useNavigation();
 	const [isLogged, setIsLogged] = useState(false);
-	const [chat, setChat] = useState(false);
+	// const [chat, setChat] = useState(true);
 	const [otherUserIds, setOtherUserIds] = useState([]);
 	const [friendIds, setFriendIds] = useState([]);
 	const [friends, setFriends] = useState([]);
@@ -99,7 +99,6 @@ export default function ApplicationContextProvider({ children }) {
 			user, setUser,
 			password, setPassword, 
 			userId, setUserId,
-			chat, setChat,
 			messageLobby,
 			friendIds, setFriendIds,
 			friends, setFriends

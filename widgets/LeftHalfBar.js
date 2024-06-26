@@ -1,11 +1,14 @@
 import { forwardRef, useState } from "react"
-import { TextInput, View, TouchableOpacity, StyleSheet, Text } from "react-native"
+import { TextInput, View, TouchableOpacity, StyleSheet, Text, Keyboard } from "react-native"
 import { SvgXml } from "react-native-svg"
 import fireIcon from '../assets/fire-icon';
 
-const LeftHalfBar = ({chatToggle}) => {
+const LeftHalfBar = ({toggleComment}) => {
+    const pressHandler = () => {
+        toggleComment();
+    }
 	return (
-        <TouchableOpacity style={styles.container} onPress={chatToggle}>
+        <TouchableOpacity style={styles.container} onPress={pressHandler}>
             <Text style={styles.text}>Send message</Text>
         </TouchableOpacity>
 		

@@ -8,8 +8,10 @@ import { getDoc, doc, updateDoc, onSnapshot } from 'firebase/firestore';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 //icon
 import iconBack from "../../assets/back-icon";
+import { useApplicationContext } from '../../hooks/useApplicationContext';
 
 const ChangeNameScreen = ({ navigation }) => {
+    const { user, setUser } = useApplicationContext();
     const [firstName, setFirstName] = useState('');
     const [lastName, setLastName] = useState('');
     const [userId, setUserId] = useState(null);
@@ -49,8 +51,14 @@ const ChangeNameScreen = ({ navigation }) => {
                 const userDocRef = doc(db, 'user', userId);
                 await updateDoc(userDocRef, {
                     firstName: firstName,
-                    lastName: lastName
+                    lastName: lastName,
+                    userName: firstName + ' ' + lastName
                 });
+                setUser(prev => ({
+                    ...prev, 
+                    firstName, lastName, 
+                    userName: firstName + ' ' + lastName})); 
+
                 console.log("Document written with ID: ", userId);
                 navigation.reset({
                     index: 10,

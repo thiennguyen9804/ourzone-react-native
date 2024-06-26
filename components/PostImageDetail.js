@@ -9,7 +9,7 @@ export default function PostImageDetail({currentPost, currentUser}) {
 	
 
 	const { height } = useWindowDimensions();
-	// console.log('currentPost', currentPost);
+	console.log('currentPost', currentPost);
 	// console.log('currentUser', currentUser);
 	// console.log('createdAt: ', currentPost.createdAt, new Date(currentPost.createdAt.seconds * 1000));
 	return (
@@ -30,12 +30,12 @@ export default function PostImageDetail({currentPost, currentUser}) {
 				{/* avatar */}
 				<View style={styles.avatarContainer}>
 					<View style={styles.innerImageContainer}>
-						<Image style={styles.image} resizeMode='cover' source={{uri: currentUser.avatar}}/>
+						<Image style={styles.image} resizeMode='cover' source={{uri: currentUser && currentUser.avatar}}/>
 					</View>
 				</View>
 
 				{/* name */}
-				<Text style={styles.userName}>{`${currentUser.userName || ''}`}</Text>
+				<Text style={styles.userName}>{currentUser && `${currentUser.userName || ''}`}</Text>
 
 				{/* time */}
 				{/* <Text style={styles.timeTxt}>{formatDistanceToNowStrict(new Date((currentPost.createdAt.seconds * 1000) || 0))}</Text>	 */}

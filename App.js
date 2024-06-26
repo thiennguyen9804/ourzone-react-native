@@ -101,7 +101,7 @@ export default function App () {
       
         <NavigationContainer>
         <ApplicationContext>
-          <StatusBar />
+          <StatusBar translucent/>
           <GestureHandlerRootView>
             <Stack.Navigator
               screenOptions={{

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Image, Keyboard } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import arrowMessIcon from '../../assets/arrow-mess-icon';  
+import { Video, ResizeMode } from 'expo-av';
 import cameraIcon from '../../assets/camera-icon';
 import fireIcon from '../../assets/fire-icon';
 import sendIcon from '../../assets/send-icon';
@@ -127,8 +128,29 @@ const MessageBoxScreen = ({ route, navigation }) => {
     const renderItem = ({ item }) => {
         console.log('item in render item', item);
         return (
-            <View style={[styles.messageContainer, (item.sendUser === userId) ? styles.sentMessage : styles.receivedMessage]}>
-                <Text style={styles.messageText}>{item.content}</Text>
+            <View 
+                style={[(item.sendUser === userId) ? styles.sentMessage : styles.receivedMessage, {backgroundColor: '#fff', padding: 15}]}
+            >
+                {item.type && <View style={styles.imageContainer}>
+                    <View style={styles.innerImageContainer}>
+                        
+                        {item.type === 'image' &&
+                            <Image source={{uri: item.image}} resizeMode='cover' style={styles.image}/>
+                        }
+                        {item.type === 'video' &&
+                            <Video
+                                style={styles.image}
+                                source={{uri: item.image}}
+                                isLooping
+                                resizeMode={ResizeMode.COVER}
+                                shouldPlay
+                            />
+                        }
+                    </View>
+                </View>}
+                <View style={[styles.messageContainer, (item.sendUser === userId) ? styles.sentMessage : styles.receivedMessage]}>
+                    <Text style={styles.messageText}>{item.content}</Text>
+                </View>
             </View>
         )
     };
@@ -234,7 +256,7 @@ const styles = StyleSheet.create({
     },
     messageContainer: {
         marginVertical: 10,
-        marginHorizontal: 20,
+        marginHorizontal: 5,
         padding: 15,
         borderRadius: 10,
         maxWidth: '70%',
@@ -252,6 +274,30 @@ const styles = StyleSheet.create({
         fontFamily:'OpenSans',
 
     },
+
+    imageContainer: {
+		backgroundColor: '#AAC2B3',
+		width: '100%',
+		aspectRatio: 1,
+		borderRadius: 40,
+		padding: 15,
+		display: 'flex'
+	},
+
+	innerImageContainer: {
+		width: '100%',
+		aspectRatio: 1,
+		borderRadius: 35,
+		elevation: 13,
+		overflow: 'hidden'
+	},
+
+	image: {
+		aspectRatio: 1,
+		flex: 1,
+		width: null,
+		height: null
+	},
 });
 
 export default MessageBoxScreen;

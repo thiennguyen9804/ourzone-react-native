@@ -234,21 +234,23 @@ const CameraScreen = ({ navigation }) => {
 				// post cap
 				<>
 					{/* message */}
-					<View style={styles.imageSection}>
-						{imageUri &&
-							<Image source={{ uri: imageUri }} style={styles.camera} />
-						}
-						{videoUri &&
-							<Video
-								style={styles.camera}
-								source={{ uri: videoUri }}
-								isLooping
-								shouldPlay
-								resizeMode={ResizeMode.COVER}
-							/>
-						}
-						<View style={{ width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center' }}>
-							<TextInput textAlign='center' numberOfLines={1} style={styles.messageInput} onChangeText={setMessage} value={message} />
+					<View style={styles.cameraContainer}>
+						<View style={styles.cameraInnerContainer}>
+							{imageUri &&
+								<Image source={{ uri: imageUri }} style={styles.camera} />
+							}
+							{videoUri &&
+								<Video
+									style={styles.camera}
+									source={{ uri: videoUri }}
+									isLooping
+									shouldPlay
+									resizeMode={ResizeMode.COVER}
+								/>
+							}
+							<View style={{ width: '100%', position: 'absolute', left: 0, right: 0, bottom: 10, justifyContent: 'center', alignItems: 'center' }}>
+								<TextInput textAlign='center' numberOfLines={1} style={styles.messageInput} onChangeText={setMessage} value={message} />
+							</View>
 						</View>
 					</View>
 
@@ -282,12 +284,13 @@ const styles = StyleSheet.create({
 	},
 
 	cameraInnerContainer: {
-		backgroundColor: 'red',
+		// backgroundColor: 'red',
 		borderRadius: 30,
 		display: 'flex',
 		justifyContent: 'center',
 		alignItems: 'center',
-		overflow: 'hidden'
+		overflow: 'hidden',
+		elevation: 13,
 	},
 
 	cameraContainer: {

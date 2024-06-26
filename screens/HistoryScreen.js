@@ -10,7 +10,7 @@ import PostVideo from "../components/PostVideo";
 import { useApplicationContext } from "../hooks/useApplicationContext";
 import { usePost } from "../hooks/usePost";
 import { useUser } from "../hooks/useUser";
-
+import EmojiSelector from 'react-native-emoji-selector';
 // icons
 import backIcon from "../assets/back-icon";
 import friendArrowIcon from "../assets/friend-arrow-icon";
@@ -19,20 +19,35 @@ import gridIcon from "../assets/grid-icon";
 import shareIcon from "../assets/share-icon"
 import PostItemDetail from "../components/PostItemDetail";
 import ReactionBar from "../widgets/ReactionBar";
+import HistoryFooter from "../components/HistoryFooter";
+import ChatBar from "../widgets/ChatBar";
+import { db } from '../firebase'
+import { collection, getDocs, query, or, where, limit } from "firebase/firestore";
+import { useMessage } from "../hooks/useMessage";
 
 let globalChat = false;
 
 const HistoryScreen = ({ navigation }) => {
-	const { postIds, setPostIds, newsfeed, chat, setChat } = useApplicationContext();
+	const { postIds, setPostIds, newsfeed, user } = useApplicationContext();
+	const [currentUser, setCurrentUser] = useState({});
+	const [currentPost, setCurrentPost] = useState({});
 	const [isFriendsOpen, setIsFriendsOpen] = useState(false);
+	const [comment, setComment] = useState(false); 
+	const [emojiOpen, setEmojiOpen] = useState(false);
 	const [isGrid, setIsGrid] = useState(false);
 	const [postActiveId, setPostActiveId] = useState(postIds[0]);
 	const [postActiveIndex, setPostActiveIndex] = useState(0);
 	const linearListRef = useRef();
 	const toggleFriendsOpen = () => setIsFriendsOpen(curr => !curr);
+	const [content, setContent] = useState('');
+	const [outCurrentUser, setOutCurrentUser] = useState({});
+	const [outCurrentPost, setOutCurrentPost] = useState({});
 	const toggleIsGrid = () => {
 		setIsGrid(curr => !curr);
-	}
+	};
+	const toggleComment = () => setComment(prev => !prev);
+	const { addMessage } = useMessage();
+
 	const viewabilityConfigCallbackPairs = useRef([
 		{
 			viewabilityConfig: { itemVisiblePercentThreshold: 100 },
@@ -57,8 +72,41 @@ const HistoryScreen = ({ navigation }) => {
 		Keyboard.dismiss();
 	}
 
-	return (
+	const wholeScreenPressHandler = () => {
+		toggleComment();
+		Keyboard.dismiss();
+	}
 
+	const commentOnImage = async () => {
+		console.log('comment value', content, user, outCurrentUser, outCurrentPost);
+		const q = query(collection(db, 'messageRoom'), or(
+            where('users', '==', [user.userId, currentUser.userId], limit(1)),
+            where('users', '==', [currentUser.userId, user.userId], limit(1))
+        ));
+		const newValue = {
+			type: (!outCurrentPost.type || outCurrentPost.type === 'image') ? 'image' : 'video',
+			image: outCurrentPost.image,
+			sendUser: user.userId,
+			content
+		}
+
+		console.log(newValue);
+		console.log(outCurrentPost)
+		const querySnapshot = await getDocs(q);
+		let messageRoomId;
+		querySnapshot.forEach(doc => {
+			messageRoomId = doc.id;
+			
+		});
+		console.log('room', messageRoomId);
+		addMessage(messageRoomId, newValue);
+		Keyboard.dismiss();
+		toggleComment();
+		setContent('');
+		// console.log('room id', messageRoomId)
+	}
+
+	return (
 		<Animated.View
 			style={styles.container}
 			entering={SlideInDown}
@@ -87,7 +135,13 @@ const HistoryScreen = ({ navigation }) => {
 				ref={linearListRef}
 				style={[styles.list, (isGrid && {display: 'none'})]}
 				data={postIds}
-				renderItem={({item}) => (<PostItemDetail postId={item} postActiveId={postActiveId}/>)}
+				renderItem={({item}) => (
+					<PostItemDetail 
+						postId={item} 
+						postActiveId={postActiveId}
+						setOutCurrentPost={setOutCurrentPost}
+						setOutCurrentUser={setCurrentUser}
+					/>)}
 				numColumns={1}
 				showsVerticalScrollIndicator={false}
 				showsHorizontalScrollIndicator={false}
@@ -119,21 +173,14 @@ const HistoryScreen = ({ navigation }) => {
 			/> */}
 			
 			{/* footer buttons */}
-			<View style={styles.footerSection}>
-				{/* grid */}
-				<TouchableOpacity onPress={toggleIsGrid}>
-					<SvgXml xml={gridIcon}/>
-				</TouchableOpacity>
-
-				{/* reaction bar */}
-				<ReactionBar />
-
-				{/* share */}
-				<TouchableOpacity>
-					<SvgXml xml={shareIcon}/>
-				</TouchableOpacity>
-			</View>
-
+			{comment && 
+			<ChatBar 
+				toggleComment={toggleComment}
+				content={content}
+				setContent={setContent}
+				commentOnImage={commentOnImage}
+			/>}
+			{!comment && <HistoryFooter toggleComment={toggleComment} toggleIsGrid />}
 		</Animated.View>
 	)
 }

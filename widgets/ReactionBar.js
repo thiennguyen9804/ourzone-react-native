@@ -6,22 +6,24 @@ import { useState } from "react";
 import { useApplicationContext } from "../hooks/useApplicationContext";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
-export default function ReactionBar() {
-	const { chat, setChat } = useApplicationContext();
-	const chatToggle = () => setChat(prev => !prev);
+export default function ReactionBar({ toggleComment }) {
+	// const { chat, setChat } = useApplicationContext();
+	// const chatToggle = () => setChat(prev => !prev);
 	const pressHandler = () => {
-		
+		// chatToggle();
+		Keyboard.dismiss();
+		toggleComment();
 	}
+	
 	return (
-		<TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+		<View onPress={pressHandler}>
 			<View style={styles.container}>
-				{/* {chat && <ChatBar />} */}
 				<View style={styles.reactionContainer}>
-					<LeftHalfBar chatToggle={chatToggle}/>
+					<LeftHalfBar toggleComment={toggleComment} />
 					<RightHalfBar/>
 				</View>
 			</View>
-		</TouchableWithoutFeedback>
+		</View>
 	)
 };
 

@@ -7,7 +7,11 @@ import { formatDistanceToNowStrict } from 'date-fns/formatDistanceToNowStrict';
 import PostImageDetail from './PostImageDetail';
 import PostVideoDetail from './PostVideoDetail';
 
-export default function PostItemDetail({postId, postActiveId}) {
+export default function PostItemDetail({
+	postId, postActiveId,
+	outCurrentUser, setOutCurrentUser,
+	outCurrentPost, setOutCurrentPost
+}) {
 	console.log(postId, postActiveId);
 	const [currentUser, setCurrentUser] = useState({});
 	const [currentPost, setCurrentPost] = useState({});
@@ -21,6 +25,7 @@ export default function PostItemDetail({postId, postActiveId}) {
 			try {
 				let currentPostValue = await getPostByPostId(postId).catch(reason => console.log(reason));
 				setCurrentPost(currentPostValue);
+				setOutCurrentPost(currentPostValue);
 			} catch(err) {
 				console.log(err);
 			}
@@ -35,6 +40,7 @@ export default function PostItemDetail({postId, postActiveId}) {
 			try {
 				let currentUserValue = await getUserByUserId(currentPost.userId);
 				setCurrentUser(currentUserValue);
+				setOutCurrentUser(currentUserValue);
 			} catch(err) {
 				console.log(err.message);
 			}
