@@ -27,8 +27,6 @@ export const useNewsfeed = () => {
 		})
 		
 
-		
-
 		return Promise.resolve(res);
 	}
 

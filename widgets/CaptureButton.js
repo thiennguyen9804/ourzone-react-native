@@ -37,7 +37,7 @@ const CaptureButton = ({
 	const tap = useMemo(
 		() => 
 			Gesture.Tap()
-			.maxDuration(3200)
+			.maxDuration(3600)
 			.runOnJS(true)
 			.onBegin(async () => {
 				recordingProgress.value = 0;

@@ -18,6 +18,7 @@ import chatIcon from "../assets/chat-icon";
 import gridIcon from "../assets/grid-icon";
 import shareIcon from "../assets/share-icon"
 import PostItemDetail from "../components/PostItemDetail";
+import ReactionBar from "../widgets/ReactionBar";
 
 
 const HistoryScreen = ({ navigation }) => {
@@ -117,6 +118,9 @@ const HistoryScreen = ({ navigation }) => {
 					<SvgXml xml={gridIcon}/>
 				</TouchableOpacity>
 
+				{/* reaction bar */}
+				<ReactionBar />
+
 				{/* share */}
 				<TouchableOpacity>
 					<SvgXml xml={shareIcon}/>
@@ -154,7 +158,8 @@ const styles = StyleSheet.create({
 		display: 'flex',
 		flexDirection: 'row',
 		bottom: 40,
-		justifyContent: 'space-around',
+		justifyContent: 'space-evenly',
+		alignItems: 'center',
 		zIndex: 1,
 		width: '100%'
 	},

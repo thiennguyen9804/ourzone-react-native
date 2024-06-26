@@ -23,7 +23,7 @@ export const useSendImage = () => {
 		if(!user) {
 			throw new Error('user is not exists, happened in sendImage');
 		}
-		
+
 		const fetchResponse = await fetch(imageUri);
 		const theBlob = await fetchResponse.blob();
 		const imageRef = ref(storage, `${user.userId}/${Date.now()}`);
@@ -31,7 +31,8 @@ export const useSendImage = () => {
 		const downloadUri = await getDownloadURL(imageRef);
 		// console.log('download uri', downloadUri);
 		console.log('user in use send image', user);
-		const newPostRef = await createPost(content, downloadUri, user.userId);
+		const type = isImage ? 'image' : 'video'
+		const newPostRef = await createPost(content, downloadUri, user.userId, type);
 		const newNewsfeedRef = await addNewPostIdToNewsfeed(newsfeed.newsfeedId, newPostRef.id);
 		console.log('newNewsfeedRef', newNewsfeedRef);
 		setPostIds(prev => [newPostRef.id, ...prev]);

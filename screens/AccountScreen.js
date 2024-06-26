@@ -34,8 +34,6 @@ import iconSignOut from "../assets/sign-out-icon";
 import iconDeleteAcc from "../assets/delete-acc-icon";
 import { useUser } from '../hooks/useUser';
 
-
-
 const AccountScreen = ({ navigation }) => {
     const { user, setUser } = useApplicationContext();
     const { updateUserByUserId } = useUser();
@@ -388,7 +386,7 @@ const styles = StyleSheet.create({
         flex: 1,
         paddingHorizontal: 10,
         backgroundColor: '#F8FFF8',
-        justifyContent: 'center'
+        justifyContent: 'center',
         // position: 'absolute'
     },
 

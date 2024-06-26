@@ -56,10 +56,10 @@ export default function ApplicationContextProvider({ children }) {
 	}, []);
 
 	// console.log('userId', userId);
-	// console.log('user', user);
+	console.log('user', user);
 	// console.log('auth current user', auth.currentUser.uid);
 	// console.log('auth current user', auth.currentUser);
-	// console.log('newsfeed', newsfeed);
+	console.log('newsfeed', newsfeed);
 	
 	return (
 		<ApplicationContext.Provider value={{

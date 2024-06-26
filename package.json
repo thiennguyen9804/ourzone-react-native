@@ -42,6 +42,7 @@
     "react": "18.2.0",
     "react-native": "0.74.2",
     "react-native-circular-progress": "^1.4.0",
+    "react-native-emoji-selector": "^0.2.0",
     "react-native-gesture-handler": "~2.16.1",
     "react-native-gestures": "^0.3.0",
     "react-native-image-picker": "^7.1.2",
