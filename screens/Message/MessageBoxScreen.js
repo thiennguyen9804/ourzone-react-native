@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Image } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity, TextInput, Image, Keyboard } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import arrowMessIcon from '../../assets/arrow-mess-icon';  
 import cameraIcon from '../../assets/camera-icon';
 import fireIcon from '../../assets/fire-icon';
+import sendIcon from '../../assets/send-icon';
 import { collection, limit, onSnapshot, or, query, where, getDocs } from 'firebase/firestore';
 import { app, db } from '../../firebase';
 import { useMessage } from '../../hooks/useMessage';
@@ -23,8 +24,11 @@ const MessageBoxScreen = ({ route, navigation }) => {
     // ];
 
     // let currentMessageRoom = {}
+    const { addMessage } = useMessage()
+    const [content, setContent] = useState('');
     const [messages, setMessages] = useState([]);
     const [currentMessageRoom, setCurrentMessageRoom] = useState({});
+    const [currentMessageRoomId, setCurrentMessageRoomId] = useState('');
     const [loadingMessageRoom , setLoadingMessageRoom] = useState(true);
 
     // useEffect(() => {
@@ -52,18 +56,39 @@ const MessageBoxScreen = ({ route, navigation }) => {
         ));
         const unsub = onSnapshot(q, snapshot => {
             let value = {} 
+            let valueId = ''
             snapshot.forEach(doc => {
                 console.log(doc.data());
                 value = doc.data();
+                valueId = doc.id
             });
-            console.log(value)
-            setMessages(value.messages);
+            // console.log(value)
             setCurrentMessageRoom(value);
+            setCurrentMessageRoomId(valueId);
+            setMessages(value.messages);
             setLoadingMessageRoom(true);
         });
 
         return () => unsub();
     }, []);
+
+    const sendHandler = async () => {
+        // console.log(currentMessageRoomId)
+        if(content === '')
+            return;
+        try {
+            const newValue = {
+                content,
+                sendUser: userId
+            };
+            console.log(currentMessageRoomId)
+            await addMessage(currentMessageRoomId, newValue)
+            setContent('');
+            Keyboard.dismiss();
+        } catch(error) {
+            console.log(error.message);
+        }
+    }
 
 
     const renderHeader = () => (
@@ -90,9 +115,11 @@ const MessageBoxScreen = ({ route, navigation }) => {
                 style={styles.textInput}
                 placeholder="Type a message..."
                 placeholderTextColor="#fff"
+                value={content}
+                onChangeText={setContent}
             />
-            <TouchableOpacity>            
-                <SvgXml xml={fireIcon} style={styles.icon}/>
+            <TouchableOpacity onPress={sendHandler}>            
+                <SvgXml xml={sendIcon} style={styles.icon}/>
             </TouchableOpacity> 
         </View>
     );
@@ -105,6 +132,7 @@ const MessageBoxScreen = ({ route, navigation }) => {
             </View>
         )
     };
+    console.log('currentMessageRoomId', currentMessageRoomId);
 
     return (
         <View style={styles.container}>

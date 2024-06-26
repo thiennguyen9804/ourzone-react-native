@@ -1,4 +1,4 @@
-import { doc, getDoc } from "firebase/firestore";
+import { addDoc, arrayUnion, doc, getDoc, serverTimestamp, setDoc, updateDoc } from "firebase/firestore";
 import { db, app } from '../firebase'
 
 export const useMessage = () => {
@@ -16,5 +16,16 @@ export const useMessage = () => {
 
 		return Promise.resolve(docSnap.data());
 	}
-	return {getMessageByMessageId}
+
+	const addMessage = async (messageId, value) => {
+		if(!messageId) {
+			throw new Error('addMessage requires messageId')
+		}
+
+
+		await updateDoc(doc(db, 'messageRoom', messageId), {
+			messages: arrayUnion({...value, createdAt: Date.now()})
+		});
+	}
+	return {getMessageByMessageId, addMessage}
 }
