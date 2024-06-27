@@ -131,13 +131,13 @@ const MessageBoxScreen = ({ route, navigation }) => {
             <View 
                 style={[(item.sendUser === userId) ? styles.sentMessage : styles.receivedMessage, {backgroundColor: '#fff', padding: 15}]}
             >
-                {item.type && <View style={styles.imageContainer}>
+                {item.mediaType && <View style={styles.imageContainer}>
                     <View style={styles.innerImageContainer}>
                         
-                        {item.type === 'image' &&
+                        {item.mediaType === 'image' &&
                             <Image source={{uri: item.image}} resizeMode='cover' style={styles.image}/>
                         }
-                        {item.type === 'video' &&
+                        {item.mediaType === 'video' &&
                             <Video
                                 style={styles.image}
                                 source={{uri: item.image}}
@@ -277,7 +277,7 @@ const styles = StyleSheet.create({
 
     imageContainer: {
 		backgroundColor: '#AAC2B3',
-		width: '100%',
+		width: '80%',
 		aspectRatio: 1,
 		borderRadius: 40,
 		padding: 15,

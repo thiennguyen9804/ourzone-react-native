@@ -84,7 +84,7 @@ const HistoryScreen = ({ navigation }) => {
             where('users', '==', [currentUser.userId, user.userId], limit(1))
         ));
 		const newValue = {
-			type: (!outCurrentPost.type || outCurrentPost.type === 'image') ? 'image' : 'video',
+			mediaType: (!outCurrentPost.mediaType || outCurrentPost.mediaType === 'image') ? 'image' : 'video',
 			image: outCurrentPost.image,
 			sendUser: user.userId,
 			content

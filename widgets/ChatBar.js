@@ -9,6 +9,7 @@ const ChatBar = ({ toggleComment, content, setContent, commentOnImage }) => {
 	const pressHandler = () => {
 		toggleComment();
 		Keyboard.dismiss();
+		setContent('');
 	}
 	return (
 		<>

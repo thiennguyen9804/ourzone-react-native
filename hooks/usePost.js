@@ -28,7 +28,7 @@ export const usePost = () => {
 			createdAt: Timestamp.fromMillis(Date.now()),
 			image,
 			userId,
-			type
+			mediaType: type
 		};
 
 		const newPostRef = await addDoc(collection(db, 'post'), newPost);

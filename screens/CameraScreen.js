@@ -66,14 +66,13 @@ const CameraScreen = ({ navigation }) => {
 						data.uri,
 						[{rotate: 180}, {flip: FlipType.Vertical}]
 					);
-
 					setImageUri(manipResult.uri);
 				} else {
 					setImageUri(data.uri);
 				}
 
 
-				setImageUri(data.uri)
+				// setImageUri(data.uri)
 				if (data.uri) {
 					// console.log(imag)
 					toggleStatus();
@@ -121,9 +120,9 @@ const CameraScreen = ({ navigation }) => {
 		
 		try {
 			if(imageUri)
-				await sendImage(imageUri, message);
-			else if(videoUri) 
-				await sendImage(videoUri, message)
+				await sendImage(imageUri, message, true);
+			else
+				await sendImage(videoUri, message, false);
 			setImageUri(null);
 			setVideoUri(null)
 			setMessage('');

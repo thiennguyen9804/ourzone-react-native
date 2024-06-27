@@ -47,12 +47,14 @@ export default function PostItemDetail({
 
 		})();
 	}, [setCurrentUser, currentPost]);
+
+	// console.log(currentPost)
 	return (
 		<>
-			{currentPost.type === 'image' || !currentPost.type && (
+			{(currentPost.mediaType === 'image' || !currentPost.mediaType) && (
 				<PostImageDetail currentPost={currentPost} currentUser={currentUser}/>
 			)}
-			{currentPost.type === 'video' && (
+			{currentPost.mediaType === 'video' && (
 				<PostVideoDetail currentPost={currentPost} currentUser={currentUser}/>
 			)} 
 		</>
