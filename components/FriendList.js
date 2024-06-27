@@ -8,7 +8,12 @@ import AllFriendFilter from "../widgets/AllFriendFilter";
 
 const {width, height} = Dimensions.get('window');
 const containerWidth = 300
-const FriendList = ({toggleFriendsOpen, filterUserId, setFilterUserId, setFilterPostIds, postIds}) => {
+const FriendList = ({
+	toggleFriendsOpen, 
+	filterUserId, setFilterUserId, 
+	filterUserName, setFilterUserName,
+	setFilterPostIds, postIds
+}) => {
 	const navigation = useNavigation();
 	const { friends } = useApplicationContext();
 	// console.log('friends: ');
@@ -30,6 +35,8 @@ const FriendList = ({toggleFriendsOpen, filterUserId, setFilterUserId, setFilter
 								<AllFriendFilter 
 									setFilterUserId={setFilterUserId}	
 									toggleFriendsOpen={toggleFriendsOpen}
+									filterUserName={filterUserName}
+									setFilterUserName={setFilterUserName}
 								/>
 							)
 						}
@@ -42,6 +49,8 @@ const FriendList = ({toggleFriendsOpen, filterUserId, setFilterUserId, setFilter
 									avatar={item.avatar}
 									navigation={navigation}
 									setFilterPostIds={setFilterPostIds}
+									filterUserName={filterUserName}
+									setFilterUserName={setFilterUserName}
 								/>)
 					}}
 					keyExtractor={(item) => `${item.userId} ${Math.random()}`}

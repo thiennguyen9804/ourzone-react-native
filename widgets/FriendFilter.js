@@ -7,7 +7,7 @@ import { usePost } from '../hooks/usePost';
 
 const FriendFilter = ({ 
 	username, navigation, avatar, userId, setFilterUserId, toggleFriendsOpen,
-	setFilterPostIds, postIds
+	setFilterPostIds, postIds, filterUserName, setFilterUserName,
 }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const { getPostByPostId } = usePost();
@@ -27,7 +27,7 @@ const FriendFilter = ({
 
   const pressHandler = (userId) => {
 	setFilterUserId(userId);
-
+  setFilterUserName(username)
 	toggleFriendsOpen();
   }
 

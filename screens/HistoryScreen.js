@@ -32,6 +32,7 @@ const HistoryScreen = ({ navigation }) => {
 	const { postIds, setPostIds, newsfeed, user, posts } = useApplicationContext();
 	const [filterPostIds, setFilterPostIds] = useState([]);
 	const [filterUserId, setFilterUserId] = useState('all');
+	const [filterUserName, setFilterUserName] = useState('All Friends');
 	const [currentUser, setCurrentUser] = useState({});
 	const [currentPost, setCurrentPost] = useState({});
 	const [isFriendsOpen, setIsFriendsOpen] = useState(false);
@@ -147,7 +148,7 @@ const HistoryScreen = ({ navigation }) => {
 
 				{/* friend filter */}
 				<TouchableOpacity style={styles.friendBtn} onPress={toggleFriendsOpen}>
-					<Text style={styles.friendTxt}>All Friends</Text>
+					<Text style={styles.friendTxt}>{filterUserName}</Text>
 					<SvgXml translateY={2.6} rotation={!isFriendsOpen ? 0 : 180.0} xml={friendArrowIcon} />
 				</TouchableOpacity>
 
@@ -155,7 +156,9 @@ const HistoryScreen = ({ navigation }) => {
 				<FriendList 
 					toggleFriendsOpen={toggleFriendsOpen} 
 					filterUserId={filterUserId} setFilterUserId={setFilterUserId}
+					filterUserName={filterUserName} setFilterUserName={setFilterUserName}
 					postIds={postIds} setFilterPostIds={setFilterPostIds}
+
 				/>}
 
 				{/* chat btn */}
