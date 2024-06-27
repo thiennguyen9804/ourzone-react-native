@@ -9,9 +9,10 @@ import sadEmojiIcon from "../assets/sad-emoji-icon";
 import fireEmojiIcon from "../assets/fire-emoji-icon";
 import moreEmojiIcon from "../assets/more-emoji-icon"
 
-const RightHalfBar = () => {
+const RightHalfBar = ({toggleEmojiOpen}) => {
 	const [emojiOpen, setEmojiOpen] = useState(false);
 	const pressHandler = () => {
+		toggleEmojiOpen();
 	}
 	return (
 		<TouchableOpacity style={styles.container} onPress={pressHandler}>

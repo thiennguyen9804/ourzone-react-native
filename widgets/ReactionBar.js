@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useApplicationContext } from "../hooks/useApplicationContext";
 import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 
-export default function ReactionBar({ toggleComment }) {
+export default function ReactionBar({ toggleComment, toggleEmojiOpen }) {
 	// const { chat, setChat } = useApplicationContext();
 	// const chatToggle = () => setChat(prev => !prev);
 	const pressHandler = () => {
@@ -20,7 +20,7 @@ export default function ReactionBar({ toggleComment }) {
 			<View style={styles.container}>
 				<View style={styles.reactionContainer}>
 					<LeftHalfBar toggleComment={toggleComment} />
-					<RightHalfBar/>
+					<RightHalfBar toggleEmojiOpen={toggleEmojiOpen}/>
 				</View>
 			</View>
 		</View>

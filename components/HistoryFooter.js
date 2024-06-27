@@ -3,11 +3,13 @@ import gridIcon from '../assets/grid-icon';
 import shareIcon from '../assets/share-icon';
 import { SvgXml } from 'react-native-svg';
 import ReactionBar from '../widgets/ReactionBar';
+import MyReactionBar from '../widgets/MyReactionBar';
 
-const HistoryFooter = ({toggleIsGrid, toggleComment}) => {
+const HistoryFooter = ({toggleIsGrid, toggleComment, toggleEmojiOpen, isMe, outCurrentPost}) => {
 	const pressHandler = () => {
 		Keyboard.dismiss();
 	}
+	console.log('isMe', isMe);
 	return (
 		<View style={styles.footerSection}>
 			{/* grid */}
@@ -16,7 +18,8 @@ const HistoryFooter = ({toggleIsGrid, toggleComment}) => {
 			</TouchableOpacity>
 
 			{/* reaction bar */}
-			<ReactionBar toggleComment={toggleComment}/>
+			{!isMe && <ReactionBar toggleComment={toggleComment} toggleEmojiOpen={toggleEmojiOpen}/>}
+			{isMe && <MyReactionBar outCurrentPost={outCurrentPost}/>}
 
 			{/* share */}
 			<TouchableOpacity>

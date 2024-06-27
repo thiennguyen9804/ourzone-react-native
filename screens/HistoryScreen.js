@@ -25,6 +25,7 @@ import { db } from '../firebase'
 import { collection, getDocs, query, or, where, limit } from "firebase/firestore";
 import { useMessage } from "../hooks/useMessage";
 import FriendList from "../components/FriendList";
+import EmojiModal from "../widgets/EmojiModal";
 
 let globalChat = false;
 
@@ -47,11 +48,13 @@ const HistoryScreen = ({ navigation }) => {
 	const [outCurrentUser, setOutCurrentUser] = useState({});
 	const [outCurrentPost, setOutCurrentPost] = useState({});
 	const { getPostByPostId } = usePost();
+	const [isMe, setIsMe] = useState();
 	const toggleIsGrid = () => {
 		setIsGrid(curr => !curr);
 	};
-	const toggleComment = () => setComment(prev => !prev);
 	const { addMessage } = useMessage();
+	const toggleComment = () => setComment(prev => !prev);
+	const toggleEmojiOpen = () => setEmojiOpen(prev => !prev);
 	// console.log('all posts', posts);
 
 	const viewabilityConfigCallbackPairs = useRef([
@@ -158,7 +161,6 @@ const HistoryScreen = ({ navigation }) => {
 					filterUserId={filterUserId} setFilterUserId={setFilterUserId}
 					filterUserName={filterUserName} setFilterUserName={setFilterUserName}
 					postIds={postIds} setFilterPostIds={setFilterPostIds}
-
 				/>}
 
 				{/* chat btn */}
@@ -179,6 +181,7 @@ const HistoryScreen = ({ navigation }) => {
 						postActiveId={postActiveId}
 						setOutCurrentPost={setOutCurrentPost}
 						setOutCurrentUser={setCurrentUser}
+						setIsMe={setIsMe}
 					/>)}
 				numColumns={1}
 				showsVerticalScrollIndicator={false}
@@ -218,7 +221,20 @@ const HistoryScreen = ({ navigation }) => {
 				setContent={setContent}
 				commentOnImage={commentOnImage}
 			/>}
-			{!comment && <HistoryFooter toggleComment={toggleComment} toggleIsGrid />}
+
+			{emojiOpen && 
+				<EmojiModal 
+					toggleEmojiOpen={toggleEmojiOpen}
+				/>
+			}
+			{!comment && 
+			<HistoryFooter 
+				toggleComment={toggleComment} 
+				toggleIsGrid={toggleIsGrid} 
+				toggleEmojiOpen={toggleEmojiOpen}
+				isMe={isMe}
+				outCurrentPost={outCurrentPost}
+			/>}
 		</Animated.View>
 	)
 }

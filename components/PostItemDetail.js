@@ -6,13 +6,16 @@ import { usePost } from '../hooks/usePost';
 import { formatDistanceToNowStrict } from 'date-fns/formatDistanceToNowStrict';
 import PostImageDetail from './PostImageDetail';
 import PostVideoDetail from './PostVideoDetail';
+import { useApplicationContext } from '../hooks/useApplicationContext';
 
 export default function PostItemDetail({
 	postId, postActiveId,
 	outCurrentUser, setOutCurrentUser,
-	outCurrentPost, setOutCurrentPost
+	outCurrentPost, setOutCurrentPost,
+	setIsMe
 }) {
 	// console.log(postId, postActiveId);
+	const { user } = useApplicationContext();
 	const [currentUser, setCurrentUser] = useState({});
 	const [currentPost, setCurrentPost] = useState({});
 	const { getUserByUserId } = useUser();
@@ -26,6 +29,7 @@ export default function PostItemDetail({
 				let currentPostValue = await getPostByPostId(postId).catch(reason => console.log(reason));
 				setCurrentPost(currentPostValue);
 				setOutCurrentPost(currentPostValue);
+				setIsMe(user.userId === currentPostValue.userId);
 			} catch(err) {
 				console.log(err);
 			}
