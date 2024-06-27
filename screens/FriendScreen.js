@@ -23,7 +23,7 @@ const FriendsScreen = ({ navigation }) => {
   //   { id: '2', username: 'Jane Smith', avatar: 'https://via.placeholder.com/150' }
   // ];
 
-  const { friends, setFriends, friendIds, requests, setRequests } = useApplicationContext();
+  const { friends, setFriends, friendIds, requests, setRequests, suggestions, setSuggestions } = useApplicationContext();
   console.log('friends', friends)
   console.log('friendIds', friendIds);
   // const requestsSampleData = [
@@ -35,6 +35,8 @@ const FriendsScreen = ({ navigation }) => {
     { id: '5', username: 'Charlie Davis', avatar: 'https://via.placeholder.com/150' },
     { id: '6', username: 'Diana Miller', avatar: 'https://via.placeholder.com/150' }
   ];
+
+  console.log('suggestion', suggestions)
 
   const renderHeader = () => (
     <View style={styles.container}>
@@ -125,17 +127,19 @@ const FriendsScreen = ({ navigation }) => {
               <SvgXml xml={friendSuggestionIcon} style={styles.searchIcon} />
               <Text style={styles.sectionHeader}>Suggestions for you</Text>
             </View>
+
+            {/* suggestion */}
             <FlatList
               style={styles.flatList}
-              data={suggestionsSampleData}
+              data={suggestions}
               renderItem={({ item, index }) => (
                 
                 <UserSearchCard
-                  username={item.username}
+                  username={item.userName}
                   avatar={item.avatar}
                 />
               )}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.userId}
               horizontal={false}
             />
           </View>

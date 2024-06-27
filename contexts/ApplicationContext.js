@@ -91,6 +91,25 @@ export default function ApplicationContextProvider({ children }) {
 							setRequests(prev => [...prev, elem]);
 					});
 
+					// get suggestionIds
+					let ttemp = otherUserIds.filter(elem => {
+						if(!friendIdsValue.includes(elem.split('_')[0]) && (!requestIdsValue.includes(elem.split('_')[0]))) {
+							return elem;
+						}
+					});
+
+					console.log('ttemp', ttemp);
+
+					// get suggestion
+					setSuggestionIds(ttemp);
+
+					ttemp.forEach(async id => {
+						let elem = await getUserByUserId(id);
+						if(elem)
+						// console.log(elem);
+							setSuggestions(prev => [...prev, elem]);
+					})
+
 
 					// get message lobby
 					const unsubscribeMessageLobby = onSnapshot(
@@ -128,6 +147,8 @@ export default function ApplicationContextProvider({ children }) {
 			friends, setFriends,
 			requestIds, setRequestIds,
 			requests, setRequests,
+			suggestionIds, setSuggestionIds,
+			suggestions, setSuggestions,
 			globaleWidth: width, globalHeight: height
 		}}>
 			{children}
