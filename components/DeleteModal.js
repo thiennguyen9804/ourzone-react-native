@@ -19,7 +19,7 @@ const DeleteModal = ({ visible, closeModal, username, onDelete }) => {
           <View style={styles.modalContainer}>
             <View style={styles.modalContent}>
               <TouchableOpacity style={styles.deleteButton} onPress={handleDelete}>
-                <Text style={styles.buttonText}>DELETE {username.toUpperCase()} ?</Text>
+                <Text style={styles.buttonText}>DELETE {username && username.toUpperCase()} ?</Text>
               </TouchableOpacity>
             </View>
           </View>

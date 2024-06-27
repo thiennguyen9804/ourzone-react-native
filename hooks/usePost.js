@@ -6,7 +6,7 @@ import { useApplicationContext } from "./useApplicationContext";
 
 
 export const usePost = () => {
-	const getPostByPostId = async postId => {
+	const getPostByPostId = async (postId, setPosts) => {
 		if(!postId) {
 			throw new Error('postId is required');
 		}
@@ -16,11 +16,36 @@ export const usePost = () => {
 		querySnapshot.forEach(doc => {
 			if(doc.exists()) {
 				res = doc.data();
+				if(setPosts) {
+					console.log('+++++++++++++++++++++++++++++++++++++');
+					console.log(doc.data());
+					setPosts(prev => [doc.data(), ...prev]);
+				}
 			}
 		});
 
 		return Promise.resolve(res);
 	}	
+
+	// const getPostByPostIdAndUserId = async (postId, userId) => {
+	// 	if(!postId) {
+	// 		throw new Error('getPostByPostIdAndUserId requires postId');
+	// 	}
+	// 	let res = {}
+	// 	const q = query(collection(db, 'post'), where('postId', '==', postId), limit(1));
+	// 	const querySnapshot = await getDocs(q);
+	// 	querySnapshot.forEach(doc => {
+	// 		if(doc.exists()) {
+	// 			res = doc.data();
+	// 			if(setPosts) {
+	// 				console.log(res.data());
+	// 				setPosts(prev => [doc.data(), ...prev]);
+	// 			}
+	// 		}
+	// 	});
+
+	// 	return Promise.resolve(res);
+	// }	
 
 	const createPost = async (content, image, userId, type) => {
 		const newPost = {

@@ -2,10 +2,15 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import arrowLeftIcon from '../assets/arrow-left-icon';
-import DeleteModal from './DeleteModal';
+import { usePost } from '../hooks/usePost';
+// import DeleteModal from './DeleteModal';
 
-const UserFriendCard = ({ username, navigation, avatar, userId }) => {
+const FriendFilter = ({ 
+	username, navigation, avatar, userId, setFilterUserId, toggleFriendsOpen,
+	setFilterPostIds, postIds
+}) => {
   const [modalVisible, setModalVisible] = useState(false);
+  const { getPostByPostId } = usePost();
 
   const openModal = () => {
     setModalVisible(true);
@@ -20,6 +25,12 @@ const UserFriendCard = ({ username, navigation, avatar, userId }) => {
     closeModal();
   };
 
+  const pressHandler = (userId) => {
+	setFilterUserId(userId);
+
+	toggleFriendsOpen();
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
@@ -27,13 +38,13 @@ const UserFriendCard = ({ username, navigation, avatar, userId }) => {
           <Image style={styles.avatar} source={{ uri: avatar }} />
         </View>
       </View>
-      <TouchableOpacity style={styles.usernameButton} onPress={openModal}>
+      <TouchableOpacity style={styles.usernameButton}>
         <Text style={styles.usernameText}>{username}</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={styles.messButton} onPress={() => navigation.navigate('MessageBox')}>
+      <TouchableOpacity style={styles.messButton} onPress={() => pressHandler(userId)}>
         <SvgXml xml={arrowLeftIcon}></SvgXml>
       </TouchableOpacity>
-      <DeleteModal visible={modalVisible} closeModal={closeModal} username={username} onDelete={handleDelete} />
+      {/* <DeleteModal visible={modalVisible} closeModal={closeModal} username={username} onDelete={handleDelete} /> */}
     </View>
   );
 };
@@ -91,4 +102,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default UserFriendCard;
+export default FriendFilter;

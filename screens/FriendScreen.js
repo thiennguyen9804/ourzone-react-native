@@ -15,17 +15,21 @@ import friendShareIcon from '../assets/friend-share-icon';
 import UserSearchCard from '../components/UserSearchCard';
 import UserFriendCard from '../components/UserFriendCard';
 import UserRequestCard from '../components/UserRequestCard';
+import { useApplicationContext } from '../hooks/useApplicationContext';
 
 const FriendsScreen = ({ navigation }) => {
-  const friendsSampleData = [
-    { id: '1', username: 'John Doe', avatar: 'https://via.placeholder.com/150' },
-    { id: '2', username: 'Jane Smith', avatar: 'https://via.placeholder.com/150' }
-  ];
+  // const friendsSampleData = [
+  //   { id: '1', username: 'John Doe', avatar: 'https://via.placeholder.com/150' },
+  //   { id: '2', username: 'Jane Smith', avatar: 'https://via.placeholder.com/150' }
+  // ];
 
-  const requestsSampleData = [
-    { id: '3', username: 'Alice Johnson', avatar: 'https://via.placeholder.com/150' },
-    { id: '4', username: 'Bob Brown', avatar: 'https://via.placeholder.com/150' }
-  ];
+  const { friends, setFriends, friendIds, requests, setRequests } = useApplicationContext();
+  console.log('friends', friends)
+  console.log('friendIds', friendIds);
+  // const requestsSampleData = [
+  //   { id: '3', username: 'Alice Johnson', avatar: 'https://via.placeholder.com/150' },
+  //   { id: '4', username: 'Bob Brown', avatar: 'https://via.placeholder.com/150' }
+  // ];
 
   const suggestionsSampleData = [
     { id: '5', username: 'Charlie Davis', avatar: 'https://via.placeholder.com/150' },
@@ -72,7 +76,7 @@ const FriendsScreen = ({ navigation }) => {
       style={styles.scrollView}
       data={[]}
       renderItem={null}
-      keyExtractor={(item, index) => index.toString()}
+      keyExtractor={(item, index) => `${index.toString()} ${new Date()} ${Math.random()}` }
       ListEmptyComponent={() => (
         <>
           <View style={styles.recyclerView}>
@@ -80,17 +84,19 @@ const FriendsScreen = ({ navigation }) => {
               <SvgXml xml={friendIcon} style={styles.searchIcon} />
               <Text style={styles.sectionHeader}>Your Friends</Text>
             </View>
+            {/* current friends */}
             <FlatList
               style={styles.flatList}
-              data={friendsSampleData}
+              data={friends}
               renderItem={({ item }) => (
                 <UserFriendCard
-                  username={item.username}
+                  username={item.userName}
                   avatar={item.avatar}
                   navigation={navigation}
                 />
               )}
-              keyExtractor={(item) => item.id}
+              showsVerticalScrollIndicator
+              keyExtractor={(item) => item.userId}
               horizontal={false}
             />
           </View>
@@ -99,16 +105,19 @@ const FriendsScreen = ({ navigation }) => {
               <SvgXml xml={friendRequestIcon} style={styles.searchIcon} />
               <Text style={styles.sectionHeader}>Friend Requests</Text>
             </View>
+
+            {/* requests  */}
             <FlatList
               style={styles.flatList}
-              data={requestsSampleData}
+              data={requests}
               renderItem={({ item }) => (
                 <UserRequestCard
-                  username={item.username}
+                  userId={item.userId}
+                  username={item.userName}
                   avatar={item.avatar}
                 />
               )}
-              keyExtractor={(item) => item.id}
+              keyExtractor={(item) => item.userId}
             />
           </View>
           <View style={styles.recyclerView}>
@@ -119,7 +128,8 @@ const FriendsScreen = ({ navigation }) => {
             <FlatList
               style={styles.flatList}
               data={suggestionsSampleData}
-              renderItem={({ item }) => (
+              renderItem={({ item, index }) => (
+                
                 <UserSearchCard
                   username={item.username}
                   avatar={item.avatar}
@@ -133,7 +143,7 @@ const FriendsScreen = ({ navigation }) => {
             <View style={styles.headerRow}>
               <SvgXml xml={friendInviteIcon} style={styles.searchIcon} />
               <Text style={styles.sectionHeader}>Invite from other apps</Text>
-            </View>
+            </View> 
           </View>
         </>
       )}
@@ -220,12 +230,13 @@ const styles = {
 
     
   },
+  
   flatList:{
     borderRadius: 30,
     backgroundColor:  '#F8FFF8',
     marginHorizontal:10,
-    
   },
+
   sectionHeader: {
     fontFamily: 'OpenSansBold',
     fontWeight: 'bold',

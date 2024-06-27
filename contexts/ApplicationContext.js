@@ -33,9 +33,13 @@ export default function ApplicationContextProvider({ children }) {
 	const navigation  = useNavigation();
 	const [isLogged, setIsLogged] = useState(false);
 	// const [chat, setChat] = useState(true);
-	const [otherUserIds, setOtherUserIds] = useState([]);
+	const [otherUserIds, setOtherUserIds] = useState([]); // raw value of friends, have not been categorized yet
 	const [friendIds, setFriendIds] = useState([]);
 	const [friends, setFriends] = useState([]);
+	const [requestIds, setRequestIds] = useState([]);
+	const [requests, setRequests] = useState([]);
+	const [suggestionIds, setSuggestionIds] = useState([]);
+	const [suggestions, setSuggestions] = useState([]);
 	let messageLobby;
 	let messageRoomIds;
 
@@ -54,7 +58,10 @@ export default function ApplicationContextProvider({ children }) {
 					setUserId(userIdValue);
 					const userValue = await getUserByUserId(userIdValue, setUser);
 					// get newsfeed and posts
-					getNewsfeedByUserId(userIdValue, setNewsfeed, setPostIds);
+					const newsfeedValue = await getNewsfeedByUserId(userIdValue, setNewsfeed, setPostIds);
+
+					// get detail posts
+					newsfeedValue.posts.forEach(async elem => await getPostByPostId(elem, setPosts));
 					// get other users
 					const otherUserIdsValue = [...userValue.friends];
 					setOtherUserIds([...otherUserIdsValue]);
@@ -68,7 +75,21 @@ export default function ApplicationContextProvider({ children }) {
 						if(elem)
 						// console.log(elem);
 							setFriends(prev => [...prev, elem]);
-					})
+					});
+
+					//get requestIds
+					const requestIdsValue = otherUserIdsValue.filter(elem => elem.split('_')[1] === 'request').map(elem => elem.split('_')[0]);
+					setRequestIds(requestIdsValue);
+
+					// get requests
+					requestIdsValue.forEach(async id => {
+						let elem = await getUserByUserId(id);
+						if(elem)
+						// console.log(elem);
+							setRequests(prev => [...prev, elem]);
+					});
+
+
 					// get message lobby
 					const unsubscribeMessageLobby = onSnapshot(
 						query(collection(db, 'messageLobby'), where('userId', '==', userId), limit(1)),
@@ -93,6 +114,7 @@ export default function ApplicationContextProvider({ children }) {
 	
 	return (
 		<ApplicationContext.Provider value={{
+			posts, setPosts,
 			postIds, setPostIds, 
 			newsfeed, setNewsfeed,
 			email, setEmail, 
@@ -101,7 +123,9 @@ export default function ApplicationContextProvider({ children }) {
 			userId, setUserId,
 			messageLobby,
 			friendIds, setFriendIds,
-			friends, setFriends
+			friends, setFriends,
+			requestIds, setRequestIds,
+			requests, setRequests
 		}}>
 			{children}
 		</ApplicationContext.Provider>

@@ -2,12 +2,17 @@
 import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Modal } from 'react-native';
 import DeleteModal from './DeleteModal';
+import { useApplicationContext } from '../hooks/useApplicationContext';
+import { useUser } from '../hooks/useUser';
+import { arrayRemove, arrayUnion } from 'firebase/firestore';
 
 
 
-const UserRequestCard = ({ username, avatar }) => {
+const UserRequestCard = ({ username, avatar, userId }) => {
   const [showConfirmDialog, setShowConfirmDialog] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
+  const { friends, setFriends, requests, setRequests, user } = useApplicationContext();
+  const { updateUserByUserId } = useUser();
 
 
   const handleCardPress = () => {
@@ -29,12 +34,34 @@ const UserRequestCard = ({ username, avatar }) => {
     alert(`Deleted ${username}`);
     closeModal();
   };
+
+  const handleYesDialog = async (userId, userName) => {
+    // user accepting
+    updateUserByUserId(user.userId, {
+      friends: arrayRemove(`${userId}_request`)
+    });
+    updateUserByUserId(user.userId, {
+      friends: arrayUnion(`${userId}_friend`)
+    });
+    const newValue = requests.filter(elem => elem.userId === userId);
+    setRequests(prev => prev.filter(elem => elem.userId !== userId));
+    setFriends(prev => [...prev, newValue]);
+
+    // user accepted
+    updateUserByUserId(userId, {
+      friends: arrayRemove(`${user.userId}_pending`)
+    });
+    updateUserByUserId(userId, {
+      friends: arrayUnion(`${user.userId}_friend`)
+    });
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.avatarContainer}>
         <View style={styles.avatarOuter}>
            <Image style={styles.avatar} source={{uri: avatar} }/>
-            </View>
+        </View>
       </View>
       <TouchableOpacity style={styles.usernameButton} onPress={openModal}>
         <Text style={styles.usernameText}>{username}</Text>
@@ -56,7 +83,7 @@ const UserRequestCard = ({ username, avatar }) => {
               <TouchableOpacity style={[styles.button, styles.noButton]} onPress={handleCloseDialog}>
                 <Text style={styles.buttonText}>No</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={[styles.button, styles.yesButton]} onPress={handleCloseDialog}>
+              <TouchableOpacity style={[styles.button, styles.yesButton]} onPress={() => handleYesDialog(userId, username)}>
                 <Text style={styles.buttonText}>Yes</Text>
               </TouchableOpacity>
             </View>

@@ -9,7 +9,7 @@ export default function PostImageDetail({currentPost, currentUser}) {
 	
 
 	const { height } = useWindowDimensions();
-	console.log('currentPost', currentPost);
+	// console.log('currentPost', currentPost);
 	// console.log('currentUser', currentUser);
 	// console.log('createdAt: ', currentPost.createdAt, new Date(currentPost.createdAt.seconds * 1000));
 	return (

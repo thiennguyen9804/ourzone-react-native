@@ -12,7 +12,7 @@ export default function PostItemDetail({
 	outCurrentUser, setOutCurrentUser,
 	outCurrentPost, setOutCurrentPost
 }) {
-	console.log(postId, postActiveId);
+	// console.log(postId, postActiveId);
 	const [currentUser, setCurrentUser] = useState({});
 	const [currentPost, setCurrentPost] = useState({});
 	const { getUserByUserId } = useUser();

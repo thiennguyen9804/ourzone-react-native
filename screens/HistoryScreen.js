@@ -24,11 +24,14 @@ import ChatBar from "../widgets/ChatBar";
 import { db } from '../firebase'
 import { collection, getDocs, query, or, where, limit } from "firebase/firestore";
 import { useMessage } from "../hooks/useMessage";
+import FriendList from "../components/FriendList";
 
 let globalChat = false;
 
 const HistoryScreen = ({ navigation }) => {
-	const { postIds, setPostIds, newsfeed, user } = useApplicationContext();
+	const { postIds, setPostIds, newsfeed, user, posts } = useApplicationContext();
+	const [filterPostIds, setFilterPostIds] = useState([]);
+	const [filterUserId, setFilterUserId] = useState('all');
 	const [currentUser, setCurrentUser] = useState({});
 	const [currentPost, setCurrentPost] = useState({});
 	const [isFriendsOpen, setIsFriendsOpen] = useState(false);
@@ -42,11 +45,13 @@ const HistoryScreen = ({ navigation }) => {
 	const [content, setContent] = useState('');
 	const [outCurrentUser, setOutCurrentUser] = useState({});
 	const [outCurrentPost, setOutCurrentPost] = useState({});
+	const { getPostByPostId } = usePost();
 	const toggleIsGrid = () => {
 		setIsGrid(curr => !curr);
 	};
 	const toggleComment = () => setComment(prev => !prev);
 	const { addMessage } = useMessage();
+	// console.log('all posts', posts);
 
 	const viewabilityConfigCallbackPairs = useRef([
 		{
@@ -96,7 +101,6 @@ const HistoryScreen = ({ navigation }) => {
 		let messageRoomId;
 		querySnapshot.forEach(doc => {
 			messageRoomId = doc.id;
-			
 		});
 		console.log('room', messageRoomId);
 		addMessage(messageRoomId, newValue);
@@ -106,6 +110,29 @@ const HistoryScreen = ({ navigation }) => {
 		// console.log('room id', messageRoomId)
 	}
 
+	useEffect(() => {
+		console.log(postIds);
+		let temp = [];
+		if(filterUserId === 'all') {
+			posts.forEach(elem => {
+				temp.push(elem.postId);
+			});
+		} else {
+			posts.forEach(elem => {
+				if(elem.userId === filterUserId)
+					temp.push(elem.postId);
+			});
+		}
+		console.log(temp);
+		if(temp)
+			setPostActiveId(temp[0])
+		setFilterPostIds([...temp]);
+		return () => setFilterPostIds([]);
+	}, [filterUserId]);
+	
+	
+	console.log('---------------------------------------')
+	console.log('all filter posts', filterPostIds);
 	return (
 		<Animated.View
 			style={styles.container}
@@ -124,6 +151,13 @@ const HistoryScreen = ({ navigation }) => {
 					<SvgXml translateY={2.6} rotation={!isFriendsOpen ? 0 : 180.0} xml={friendArrowIcon} />
 				</TouchableOpacity>
 
+				{isFriendsOpen && 
+				<FriendList 
+					toggleFriendsOpen={toggleFriendsOpen} 
+					filterUserId={filterUserId} setFilterUserId={setFilterUserId}
+					postIds={postIds} setFilterPostIds={setFilterPostIds}
+				/>}
+
 				{/* chat btn */}
 				<TouchableOpacity style={styles.chatBtn} onPress={() => navigation.navigate('Message')}>
 					<SvgXml xml={chatIcon} />
@@ -132,9 +166,10 @@ const HistoryScreen = ({ navigation }) => {
 
 			{/* for linear layout */}
 			<FlatList
+				scrollEnabled={!isFriendsOpen}
 				ref={linearListRef}
 				style={[styles.list, (isGrid && {display: 'none'})]}
-				data={postIds}
+				data={filterPostIds}
 				renderItem={({item}) => (
 					<PostItemDetail 
 						postId={item} 
@@ -146,7 +181,7 @@ const HistoryScreen = ({ navigation }) => {
 				showsVerticalScrollIndicator={false}
 				showsHorizontalScrollIndicator={false}
 				pagingEnabled
-				keyExtractor={(item, index) => (`${item} ${index} ${isGrid}`)}
+				keyExtractor={(item, index) => (`${item.postId} ${index} ${isGrid}`)}
 				viewabilityConfigCallbackPairs={viewabilityConfigCallbackPairs.current}
 			/>
 
@@ -186,6 +221,7 @@ const HistoryScreen = ({ navigation }) => {
 }
 
 export default HistoryScreen
+
 
 const styles = StyleSheet.create({
 	container: {
