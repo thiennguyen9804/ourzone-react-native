@@ -31,6 +31,7 @@ let globalChat = false;
 
 const HistoryScreen = ({ navigation }) => {
 	const { postIds, setPostIds, newsfeed, user, posts } = useApplicationContext();
+	const [emoji, setEmoji] = useState();
 	const [filterPostIds, setFilterPostIds] = useState([]);
 	const [filterUserId, setFilterUserId] = useState('all');
 	const [filterUserName, setFilterUserName] = useState('All Friends');
@@ -180,7 +181,7 @@ const HistoryScreen = ({ navigation }) => {
 						postId={item} 
 						postActiveId={postActiveId}
 						setOutCurrentPost={setOutCurrentPost}
-						setOutCurrentUser={setCurrentUser}
+						setOutCurrentUser={setOutCurrentUser}
 						setIsMe={setIsMe}
 					/>)}
 				numColumns={1}
@@ -224,7 +225,11 @@ const HistoryScreen = ({ navigation }) => {
 
 			{emojiOpen && 
 				<EmojiModal 
+					emoji={emoji}
 					toggleEmojiOpen={toggleEmojiOpen}
+					setEmoji={setEmoji}
+					outCurrentPost={outCurrentPost}
+					outCurrentUser={outCurrentUser}
 				/>
 			}
 			{!comment && 

@@ -13,6 +13,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as SplashScreen from 'expo-splash-screen';
 import * as ScreenOrientation from 'expo-screen-orientation';
 import { OrientationLock } from "expo-screen-orientation";
+import { useWindowDimensions } from "react-native";
 
 
 export const ApplicationContext = createContext();
@@ -40,6 +41,7 @@ export default function ApplicationContextProvider({ children }) {
 	const [requests, setRequests] = useState([]);
 	const [suggestionIds, setSuggestionIds] = useState([]);
 	const [suggestions, setSuggestions] = useState([]);
+	const {width, height} = useWindowDimensions();
 	let messageLobby;
 	let messageRoomIds;
 
@@ -125,7 +127,8 @@ export default function ApplicationContextProvider({ children }) {
 			friendIds, setFriendIds,
 			friends, setFriends,
 			requestIds, setRequestIds,
-			requests, setRequests
+			requests, setRequests,
+			globaleWidth: width, globalHeight: height
 		}}>
 			{children}
 		</ApplicationContext.Provider>

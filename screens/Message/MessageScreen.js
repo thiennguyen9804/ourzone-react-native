@@ -32,7 +32,7 @@ const MessageScreen = ({ navigation }) => {
         return (
             <UserMessageCard 
                 username={item.userName} 
-                chat={'hello'} 
+                chat={'...'} 
                 navigation={navigation}
                 avatar={item.avatar} 
                 userId={user.userId}

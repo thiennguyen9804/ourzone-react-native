@@ -1,14 +1,17 @@
-import { View, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, TouchableOpacity, StyleSheet, TouchableWithoutFeedback, Keyboard, useWindowDimensions } from 'react-native';
 import gridIcon from '../assets/grid-icon';
 import shareIcon from '../assets/share-icon';
 import { SvgXml } from 'react-native-svg';
 import ReactionBar from '../widgets/ReactionBar';
 import MyReactionBar from '../widgets/MyReactionBar';
 
+
+
 const HistoryFooter = ({toggleIsGrid, toggleComment, toggleEmojiOpen, isMe, outCurrentPost}) => {
 	const pressHandler = () => {
 		Keyboard.dismiss();
 	}
+	const { width, height } = useWindowDimensions();
 	console.log('isMe', isMe);
 	return (
 		<View style={styles.footerSection}>
@@ -19,7 +22,7 @@ const HistoryFooter = ({toggleIsGrid, toggleComment, toggleEmojiOpen, isMe, outC
 
 			{/* reaction bar */}
 			{!isMe && <ReactionBar toggleComment={toggleComment} toggleEmojiOpen={toggleEmojiOpen}/>}
-			{isMe && <MyReactionBar outCurrentPost={outCurrentPost}/>}
+			{isMe && <MyReactionBar width={width} outCurrentPost={outCurrentPost}/>}
 
 			{/* share */}
 			<TouchableOpacity>

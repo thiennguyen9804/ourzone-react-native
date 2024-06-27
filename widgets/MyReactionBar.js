@@ -8,7 +8,7 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler";
 import AllReact from "./AllReact";
 
 
-export default function MyReactionBar({ toggleComment, toggleEmojiOpen, outCurrentPost }) {
+export default function MyReactionBar({ width, toggleComment, toggleEmojiOpen, outCurrentPost }) {
 	// const { chat, setChat } = useApplicationContext();
 	// const chatToggle = () => setChat(prev => !prev);
 	const [openAllReaction, setOpenAllReaction] = useState(false);
@@ -25,8 +25,7 @@ export default function MyReactionBar({ toggleComment, toggleEmojiOpen, outCurre
 	}
 	// console.log(reaction)
 	return (
-		<View >
-			{openAllReaction && <AllReact reaction={reaction} toggleOpenAllReaction={toggleOpenAllReaction}/>}
+		<View style={styles.largeContainer}>
 			<View style={styles.container}>
 				<View style={styles.reactionContainer}>
 					<TouchableOpacity style={styles.subContainer} onPress={pressHandler} >
@@ -35,12 +34,16 @@ export default function MyReactionBar({ toggleComment, toggleEmojiOpen, outCurre
 					</TouchableOpacity>
 				</View>
 			</View>
+			{openAllReaction && <AllReact width={width} reaction={reaction} toggleOpenAllReaction={toggleOpenAllReaction}/>}
 			
 		</View>
 	)
 };
 
 const styles = StyleSheet.create({
+	largeContainer: {
+		position: 'relative'
+	},
 	container: {
 		display: 'flex',
 		width: 250,

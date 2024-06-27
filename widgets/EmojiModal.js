@@ -3,11 +3,19 @@ import sendIcon from "../assets/send-icon";
 import { StyleSheet, TextInput, TouchableOpacity, View, Dimensions, TouchableWithoutFeedback, Keyboard} from "react-native";
 import { SvgXml } from "react-native-svg";
 import EmojiSelector, { Categories } from "react-native-emoji-selector"; 
+import { usePost } from "../hooks/usePost";
+import { arrayUnion, doc, updateDoc } from "firebase/firestore";
+import { app, db } from '../firebase'
+import { useApplicationContext } from "../hooks/useApplicationContext";
 
-const EmojiModal = ({ toggleEmojiOpen, content, setContent, commentOnImage }) => {
+const EmojiModal = ({ toggleEmojiOpen, content, setContent, commentOnImage, setEmoji, emoji, outCurrentPost, outCurrentUser }) => {
+	console.log('out current post', outCurrentPost);
+	console.log('out current user', outCurrentUser);
+	const { user } = useApplicationContext();
 	const pressHandler = () => {
 		toggleEmojiOpen();
 		Keyboard.dismiss();
+		
 		// setContent('');
 	}
 	try {
@@ -21,7 +29,24 @@ const EmojiModal = ({ toggleEmojiOpen, content, setContent, commentOnImage }) =>
 					<EmojiSelector 
 						onEmojiSelected={(emoji) => {
 							try {
-								console.log(emoji);
+								const postRef = doc(db, 'post', outCurrentPost.postId);
+								const newValue = {
+									user: {
+										userName: user.userName,
+										avatar: user.avatar,
+										userId: user.userId,
+									},
+									emoji: [
+										emoji
+									]
+								}
+
+								console.log(newValue);
+								updateDoc(postRef, {
+									reaction: arrayUnion({...newValue})
+								});
+								// setEmoji('');
+								toggleEmojiOpen();
 							} catch(error) {
 								console.log(error);
 							}
